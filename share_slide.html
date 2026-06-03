@@ -725,6 +725,9 @@
             slideImages.before = cleanToSlidePath(beforeParam);
             slideImages.after = cleanToSlidePath(afterParam);
 
+            // グローバルに保持（後から自動解決処理で使うため）
+            window._cleanFolder = cleanFolder;
+
             const ownerName = params.get('name');
             if (ownerName) {
                 const nameStr = decodeURIComponent(ownerName);
@@ -760,6 +763,63 @@
             }
             
             window.location.href = targetUrl;
+        }
+
+        // 🌐 フォルダ名だけでGitHub APIからスライド画像を自動解決する処理
+        // 判定ルール: ファイル名にbefore/afterを含み、かつpanoを含まない
+        // 判定順序: after/slide_after → B面を先に判定して誤認識を防止
+        async function autoResolveFromFolder(folderName) {
+            showLoader(true, 'お施主様フォルダから画像を検索中...');
+            try {
+                const response = await fetch(`https://api.github.com/repos/nagatomo-home-admin/vr-viewer/contents/customers/${folderName}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const contents = await response.json();
+                
+                // 画像ファイルのみを抽出
+                const imageFiles = contents.filter(item => {
+                    const name = item.name.toLowerCase();
+                    return item.type === 'file' && (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp'));
+                });
+
+                let slideA = null; // A面（before, slide_before）※panoは含まない
+                let slideB = null; // B面（after, slide_after）※panoは含まない
+
+                for (const file of imageFiles) {
+                    const name = file.name.toLowerCase();
+                    
+                    // パノラマ画像は除外する
+                    if (name.includes('pano')) {
+                        continue;
+                    }
+                    
+                    // ⚠️ B面を先に判定して誤認識を防止
+                    if (!slideB && (name.includes('after') || name.includes('slide_after'))) {
+                        slideB = file.name;
+                    } else if (!slideA && (name.includes('before') || name.includes('slide_before'))) {
+                        slideA = file.name;
+                    }
+                }
+
+                // 検出した画像をパスに変換して設定
+                if (slideA) {
+                    slideImages.before = `customers/${folderName}/${slideA}`;
+                }
+                if (slideB) {
+                    slideImages.after = `customers/${folderName}/${slideB}`;
+                }
+
+                console.log(`[自動解決] A面(Before): ${slideA || '未検出'}, B面(After): ${slideB || '未検出'}`);
+
+                return !!(slideA || slideB);
+
+            } catch (err) {
+                console.error('[自動解決] GitHub APIからの画像取得に失敗しました:', err);
+                showLoader(false);
+                showToast('❌ フォルダからの画像取得に失敗しました', true);
+                return false;
+            }
         }
 
         // ⏳ ローダー制御
@@ -971,8 +1031,19 @@
         }
 
         // 🚀 初期起動
-        window.addEventListener('DOMContentLoaded', () => {
+        window.addEventListener('DOMContentLoaded', async () => {
             parseUrlParams();
+            
+            // a/b パラメータが未指定 かつ フォルダ名が指定されている場合、GitHub APIで自動解決
+            if (!slideImages.before && !slideImages.after && window._cleanFolder) {
+                const resolved = await autoResolveFromFolder(window._cleanFolder);
+                if (!resolved) {
+                    showLoader(false);
+                    showToast("⚠️ フォルダ内にスライド画像が見つかりませんでした。", true);
+                    return;
+                }
+            }
+            
             loadImages();
             initDragEvents();
         });
