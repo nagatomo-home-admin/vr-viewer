@@ -1549,19 +1549,28 @@
         
         <div class="header-actions">
             <!-- 📁 お施主様フォルダ一括ロードボタンと説明ポップオーバーのグループ -->
-            <div style="position: relative; display: flex; align-items: center; gap: 0.5rem; width: 280px;">
-                <button class="flow-link-btn" onclick="triggerFolderSelect()" style="flex: 1; background: rgba(14, 165, 233, 0.06); border-color: var(--accent); color: var(--accent); justify-content: center; height: 38px;">
-                    <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; margin-right: 3px;">
-                        <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                    </svg>
-                    📁 お施主様フォルダを一括ロード
-                </button>
-                <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
-                
-                <!-- 💡 説明用ヘルプボタン -->
-                <button class="settings-gear-btn" id="folderRuleHelpBtn" onclick="toggleFolderRuleHelp(event)" style="border-color: var(--accent); color: var(--accent); flex-shrink: 0; background: rgba(14, 165, 233, 0.06); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;" title="ファイル命名ルールを表示">
-                    💡
-                </button>
+            <div style="position: relative; display: flex; flex-direction: column; gap: 0.5rem; width: 280px;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
+                    <button class="flow-link-btn" onclick="triggerFolderSelect()" style="flex: 1; background: rgba(14, 165, 233, 0.06); border-color: var(--accent); color: var(--accent); justify-content: center; height: 38px;">
+                        <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; margin-right: 3px;">
+                            <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                        </svg>
+                        📁 ローカルフォルダロード
+                    </button>
+                    <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
+                    
+                    <!-- 💡 説明用ヘルプボタン -->
+                    <button class="settings-gear-btn" id="folderRuleHelpBtn" onclick="toggleFolderRuleHelp(event)" style="border-color: var(--accent); color: var(--accent); flex-shrink: 0; background: rgba(14, 165, 233, 0.06); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;" title="ファイル命名ルールを表示">
+                        💡
+                    </button>
+                </div>
+
+                <!-- 🌐 GitHubオンラインロード用セレクトボックス -->
+                <div class="select-wrapper" style="width: 100%;">
+                    <select id="githubFolderSelect" onchange="handleGithubFolderSelect(this.value)" style="height: 38px; padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.8rem; border-color: var(--accent); background: rgba(255, 255, 255, 0.75);">
+                        <option value="">🌐 GitHubからロード... (読込中 ⏳)</option>
+                    </select>
+                </div>
                 
                 <!-- 💡 説明ポップオーバー（すりガラス風） -->
                 <div id="folderRulePopover" class="gif-settings-popover" style="display: none; position: absolute; top: 44px; right: 0; width: 340px; z-index: 1000; text-align: left; background: rgba(255, 255, 255, 0.95); border-color: var(--accent); padding: 1rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(14, 165, 233, 0.15);">
@@ -3846,7 +3855,11 @@
                 reader.onload = function(e) {
                     const img = document.getElementById('imgBefore');
                     if (img) img.src = e.target.result;
-                    window.slideWebUrls.before = `./slide_images/${folderSelectedFiles.slide_before.name}`;
+                    if (currentFolderProgressName && currentFolderProgressName !== "選択フォルダ") {
+                        window.slideWebUrls.before = `./customers/${currentFolderProgressName}/${folderSelectedFiles.slide_before.name}`;
+                    } else {
+                        window.slideWebUrls.before = `./slide_images/${folderSelectedFiles.slide_before.name}`;
+                    }
                     
                     const box = document.getElementById("upload-before");
                     if (box) {
@@ -3867,7 +3880,11 @@
                 reader.onload = function(e) {
                     const img = document.getElementById('imgAfter');
                     if (img) img.src = e.target.result;
-                    window.slideWebUrls.after = `./slide_images/${folderSelectedFiles.slide_after.name}`;
+                    if (currentFolderProgressName && currentFolderProgressName !== "選択フォルダ") {
+                        window.slideWebUrls.after = `./customers/${currentFolderProgressName}/${folderSelectedFiles.slide_after.name}`;
+                    } else {
+                        window.slideWebUrls.after = `./slide_images/${folderSelectedFiles.slide_after.name}`;
+                    }
                     
                     const box = document.getElementById("upload-after");
                     if (box) {
@@ -4343,8 +4360,12 @@
         function processPanoFile(file, type) {
             // 🌐 【自動URL割り振り】ドロップされたファイル名から予測される公開画像URLを自動設定！
             if (file && file.name) {
-                window.panoWebUrls[type] = `./images/${file.name}`;
-                console.log(`[PanoAutoUrl] ${type}画像にウェブURLを自動割り振りしました: ./images/${file.name}`);
+                if (currentFolderProgressName && currentFolderProgressName !== "選択フォルダ") {
+                    window.panoWebUrls[type] = `./customers/${currentFolderProgressName}/${file.name}`;
+                } else {
+                    window.panoWebUrls[type] = `./images/${file.name}`;
+                }
+                console.log(`[PanoAutoUrl] ${type}画像にウェブURLを自動割り振りしました: ${window.panoWebUrls[type]}`);
             }
 
             // ローダーの表示
@@ -5223,6 +5244,9 @@
                 
                 // 📥 共有されたお気に入りのインポートチェックを実行
                 checkAndImportSharedFavorite();
+
+                // 🌐 GitHubの顧客フォルダ一覧を自動フェッチ
+                fetchGithubCustomerFolders();
             };
 
             request.onerror = function(e) {
@@ -5777,6 +5801,134 @@
             
             switchPanoImage(nextType);
             showToast(`🔄 ${nextType === 'before' ? 'A' : 'B'} に切り替えました`);
+        }
+
+        // ==========================================
+        // 🌐 GitHub オンラインフォルダ自動取得 & ロード
+        // ==========================================
+
+        // グローバルなパノラマ画像予測URL用オブジェクト (初期化チェック)
+        if (!window.panoWebUrls) {
+            window.panoWebUrls = { before: "", after: "" };
+        }
+
+        // GitHub APIから顧客フォルダ一覧を動的取得
+        async function fetchGithubCustomerFolders() {
+            const selectEl = document.getElementById('githubFolderSelect');
+            if (!selectEl) return;
+
+            try {
+                // パブリックリポジトリのためトークンなしで contents API を利用可能
+                const response = await fetch('https://api.github.com/repos/nagatomo-home-admin/vr-viewer/contents/customers');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                
+                // フォルダのみを抽出
+                const folders = data.filter(item => item.type === 'dir').map(item => item.name);
+                
+                // 選択肢のクリアとデフォルトメッセージ
+                selectEl.innerHTML = '<option value="">🌐 GitHubからロード...</option>';
+                
+                if (folders.length === 0) {
+                    const opt = document.createElement('option');
+                    opt.value = "";
+                    opt.textContent = "顧客フォルダが見つかりません";
+                    selectEl.appendChild(opt);
+                    return;
+                }
+
+                // アルファベット/数字順に降順ソート（最新フォルダを上に表示するため）
+                folders.sort((a, b) => b.localeCompare(a));
+
+                folders.forEach(folder => {
+                    const opt = document.createElement('option');
+                    opt.value = folder;
+                    opt.textContent = folder;
+                    selectEl.appendChild(opt);
+                });
+
+                console.log(`[GitHub API] 顧客フォルダを ${folders.length} 件ロードしました。`);
+
+            } catch (err) {
+                console.error("[GitHub API] フォルダ一覧の取得に失敗しました:", err);
+                selectEl.innerHTML = '<option value="">🌐 GitHubロード失敗 (再読込はリロードしてください)</option>';
+                showToast("❌ GitHubから顧客フォルダ一覧を取得できませんでした", "#ef4444");
+            }
+        }
+
+        // ドロップダウンでお施主様フォルダが選択された時の処理
+        async function handleGithubFolderSelect(folderName) {
+            if (!folderName) return;
+
+            console.log(`[GitHub API] 顧客フォルダ選択: ${folderName}`);
+            
+            // UI上のローディング表示を表示
+            const selectEl = document.getElementById('githubFolderSelect');
+            selectEl.disabled = true;
+            
+            // 顧客名の進捗名をセット
+            currentFolderProgressName = folderName;
+
+            showToast(`🌐 オンラインから画像を取得中... ⏳`);
+
+            try {
+                // フォルダ内のファイル一覧を取得
+                const response = await fetch(`https://api.github.com/repos/nagatomo-home-admin/vr-viewer/contents/customers/${folderName}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const contents = await response.json();
+
+                // 画像ファイルのみを抽出
+                const imageItems = contents.filter(item => {
+                    const name = item.name.toLowerCase();
+                    return item.type === 'file' && (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp') || name.endsWith('.gif'));
+                });
+
+                if (imageItems.length === 0) {
+                    showToast("❌ フォルダ内に対象の画像ファイルが見つかりません", "#ef4444");
+                    selectEl.disabled = false;
+                    selectEl.value = "";
+                    return;
+                }
+
+                showToast(`📥 画像データをダウンロード中 (${imageItems.length}件)... ⏳`);
+
+                // 各画像をダウンロードし、Fileオブジェクトに変換
+                const filesList = [];
+                for (const item of imageItems) {
+                    try {
+                        const fileRes = await fetch(item.download_url);
+                        if (!fileRes.ok) continue;
+                        const blob = await fileRes.blob();
+                        
+                        // ダウンロードしたBlobからFileオブジェクトを作成（既存の分類処理へ渡すため）
+                        const file = new File([blob], item.name, { type: blob.type });
+                        filesList.push(file);
+                    } catch (fetchErr) {
+                        console.error(`[GitHub API] ファイルのフェッチ失敗: ${item.name}`, fetchErr);
+                    }
+                }
+
+                if (filesList.length === 0) {
+                    showToast("❌ 画像のダウンロードに失敗しました", "#ef4444");
+                    selectEl.disabled = false;
+                    selectEl.value = "";
+                    return;
+                }
+
+                // 既存のローカル用分類・ロード処理にそのまま渡す
+                classifyAndLoadFolderFiles(filesList);
+
+            } catch (err) {
+                console.error("[GitHub API] 画像一括ロードエラー:", err);
+                showToast("❌ GitHubからの画像ロード中にエラーが発生しました", "#ef4444");
+            } finally {
+                selectEl.disabled = false;
+                selectEl.value = ""; // 選択をクリアして再選択可能にする
+            }
         }
 
         // 重複関数削除完了
