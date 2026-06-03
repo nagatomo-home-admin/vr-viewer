@@ -1,0 +1,981 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ご提案 劇的ビフォーアフター比較 | 長友ホーム</title>
+    
+    <!-- 🎨 Google Fonts & Font Awesome CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --toggle-active: #10b981;
+            --accent: #0ea5e9;
+            --bg-dark: #0f172a;
+            --border-color: rgba(255, 255, 255, 0.15);
+            --header-bg: rgba(15, 23, 42, 0.65);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --slider-pos: 50%;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+        }
+
+        /* ✨ プレミアムすりガラス調ウェルカムヘッダー */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            padding: 1.0rem 1.5rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px) saturate(140%);
+            -webkit-backdrop-filter: blur(16px) saturate(140%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .logo-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: contain;
+            padding: 3px;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+
+        .logo-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .logo-title {
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .logo-title span {
+            color: var(--accent);
+        }
+
+        .house-owner-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        /* 📥 社内インポートバッジ (極上のすりガラス仕様) */
+        .admin-import-badge {
+            background: rgba(16, 185, 129, 0.18);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: var(--toggle-active);
+            padding: 0.35rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .admin-import-badge:active {
+            transform: scale(0.95);
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        /* 🎛️ Before/After スライダーコンテナ */
+        .slide-container {
+            position: absolute;
+            top: 68px; /* ヘッダーの高さ */
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1;
+            overflow: hidden;
+            background-color: var(--bg-dark);
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        .slide-image-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .slide-image {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* アスペクト比を維持して表示 */
+            pointer-events: none;
+            background-color: var(--bg-dark);
+        }
+
+        /* Before画像 (下層、全体表示) */
+        .before-image-wrapper {
+            z-index: 2;
+        }
+
+        /* After画像 (上層、クリップ制御 - PC版index.htmlと同一の極上 clip-path 方式！) */
+        .after-image-wrapper {
+            z-index: 3;
+            width: 100%;
+            height: 100%;
+            clip-path: polygon(var(--slider-pos) 0, 100% 0, 100% 100%, var(--slider-pos) 100%);
+        }
+
+        /* ↔️ 中央スライドハンドル */
+        .slider-handle {
+            position: absolute;
+            top: 0;
+            left: var(--slider-pos);
+            width: 4px;
+            height: 100%;
+            background-color: #ffffff;
+            z-index: 4;
+            cursor: ew-resize;
+            transform: translateX(-50%);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.6);
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 48px;
+            height: 48px;
+            background: rgba(15, 23, 42, 0.85);
+            border: 2px solid #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            transition: transform 0.15s, background-color 0.15s, border-color 0.15s;
+        }
+
+        .slider-button i {
+            font-size: 1.1rem;
+            animation: pulse-arrow 2.0s infinite;
+        }
+
+        @keyframes pulse-arrow {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .slider-handle:hover .slider-button,
+        .slider-handle:active .slider-button {
+            transform: translate(-50%, -50%) scale(1.1);
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.6);
+        }
+
+        /* 🏷️ A/B すりガラスバッジ */
+        .slide-label {
+            position: absolute;
+            top: 1.5rem; /* 下部操作バーと絶対に被らない画像上部に美しく配置！ */
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-color);
+            padding: 0.35rem 0.9rem;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            z-index: 5;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            pointer-events: none;
+            letter-spacing: 0.05em;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .before-label {
+            left: 1.2rem;
+            color: var(--accent);
+            border-color: rgba(14, 165, 233, 0.35);
+        }
+
+        .after-label {
+            right: 1.2rem;
+            color: var(--toggle-active);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        /* 📱 下段フローティング操作バー (Glassmorphism・親指タッチ最適化) */
+        .control-bar-wrapper {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 90%;
+            max-width: 420px;
+        }
+
+        .control-bar {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 14px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .control-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .control-btn-icon-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.0rem;
+        }
+
+        .control-btn-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+            transition: all 0.25s;
+        }
+
+        /* アクティブ・ホバー効果 */
+        .control-btn:hover .control-btn-icon-circle {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        /* 特別なボタン（相談・LINE） */
+        .control-btn.line-btn .control-btn-icon-circle {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--toggle-active);
+        }
+        
+        .control-btn.line-btn .control-btn-label {
+            color: var(--toggle-active);
+        }
+
+        /* ⏳ ローディングガラススピナー */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+
+        .loader-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+            color: var(--accent);
+            font-size: 2.2rem;
+        }
+
+        .loader-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.05em;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 📋 プレミアム通知トースト */
+        .toast {
+            position: absolute;
+            top: 5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.4rem;
+            border-radius: 16px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        .toast i {
+            color: var(--accent);
+        }
+
+        .toast-msg {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+        /* 📱 横画面用（Landscape）左端すりガラスサイドバー (通常時は非表示) */
+        .landscape-sidebar {
+            display: none;
+        }
+
+        /* 📱 スマホ横画面（Landscape）時の極上集約レスポンシブデザイン */
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .header {
+                display: none !important;
+            }
+
+            /* 左端に縦型すりガラスサイドバーを集約 */
+            .landscape-sidebar {
+                display: flex !important;
+                flex-direction: column;
+                width: 80px;
+                height: 100vh;
+                background: rgba(15, 23, 42, 0.85);
+                backdrop-filter: blur(20px) saturate(140%);
+                -webkit-backdrop-filter: blur(20px) saturate(140%);
+                border-right: 1px solid var(--border-color);
+                z-index: 50;
+                align-items: center;
+                justify-content: space-between;
+                padding: 1.0rem 0;
+                box-shadow: 4px 0 30px rgba(0,0,0,0.4);
+            }
+
+            .landscape-logo-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.2rem;
+                width: 100%;
+            }
+
+            .landscape-logo {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                object-fit: contain;
+                padding: 3px;
+                box-sizing: border-box;
+                background-color: #ffffff;
+            }
+
+            .landscape-owner-badge {
+                font-size: 0.5rem;
+                font-weight: 700;
+                color: var(--accent);
+                text-align: center;
+                max-width: 70px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .landscape-menu {
+                display: flex;
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: center;
+                width: 100%;
+            }
+
+            .landscape-btn {
+                background: transparent;
+                border: none;
+                color: var(--text-main);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.25rem;
+                cursor: pointer;
+                width: 100%;
+                padding: 0.4rem 0;
+                transition: all 0.2s;
+            }
+
+            .landscape-btn-icon {
+                width: 34px;
+                height: 34px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.08);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.9rem;
+                border: 1px solid rgba(255,255,255,0.05);
+                transition: all 0.2s;
+            }
+
+            .landscape-btn-label {
+                font-size: 0.55rem;
+                font-weight: 700;
+                color: var(--text-muted);
+            }
+
+            .landscape-btn:hover .landscape-btn-icon {
+                background: rgba(255,255,255,0.15);
+                color: #ffffff;
+            }
+
+            .landscape-btn:active .landscape-btn-icon {
+                transform: scale(0.9);
+            }
+
+            .landscape-btn.line-btn .landscape-btn-icon {
+                background: rgba(16, 185, 129, 0.15);
+                color: var(--toggle-active);
+                border-color: rgba(16, 185, 129, 0.3);
+            }
+            .landscape-btn.line-btn .landscape-btn-label {
+                color: var(--toggle-active);
+            }
+
+            /* スライドコンテナを右側に全画面寄せる */
+            .slide-container {
+                top: 0 !important;
+                left: 80px !important;
+                width: calc(100% - 80px) !important;
+                height: 100vh !important;
+            }
+
+            .control-bar-wrapper {
+                display: none !important; /* 横画面時は下部操作バーを完全に非表示 */
+            }
+
+            .slide-label {
+                top: 1.5rem !important; /* 横画面の時も上部配置に統一して被りを完全に防止！ */
+                bottom: auto !important;
+                padding: 0.3rem 0.7rem;
+                font-size: 0.75rem;
+            }
+            .before-label { left: 0.8rem; }
+            .after-label { right: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ✨ プレミアムすりガラス調ウェルカムヘッダー (縦画面・タブレット用) -->
+    <header class="header">
+        <div class="logo-area">
+            <img src="images/logo.png" alt="長友ホーム" class="logo-img">
+            <div class="logo-text-group">
+                <h1 class="logo-title">Nagatomo<span>Home</span></h1>
+                <div class="house-owner-name" id="houseOwnerName">✨ ご提案スライド比較</div>
+            </div>
+        </div>
+        <!-- 📥 社内インポートボタン (合言葉 admin=true 検知時のみ表示) -->
+        <button id="adminImportBtn" onclick="importToAdminTool()" class="admin-import-badge" style="display: none; margin-right: 0.5rem;">
+            📥 社内登録
+        </button>
+    </header>
+
+    <!-- 📱 スマホ横画面（Landscape）用の左端すりガラスサイドバー -->
+    <aside class="landscape-sidebar">
+        <div class="landscape-logo-container">
+            <img src="images/logo.png" alt="長友ホーム" class="landscape-logo">
+            <div class="landscape-owner-badge" id="landscapeOwnerBadge">ご提案</div>
+            
+            <!-- 📥 社内インポートボタン (横画面用・合言葉検知時のみ表示) -->
+            <button id="adminImportBtnLandscape" onclick="importToAdminTool()" class="landscape-btn" style="display: none; color: var(--toggle-active); margin: 0.2rem 0;">
+                <div class="landscape-btn-icon" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-download"></i></div>
+                <div class="landscape-btn-label" style="color: var(--toggle-active); font-size: 0.48rem;">社内登録</div>
+            </button>
+        </div>
+        
+        <div class="landscape-menu">
+            <button class="landscape-btn" onclick="resetSlider()">
+                <div class="landscape-btn-icon"><i class="fa-solid fa-arrows-left-right"></i></div>
+                <div class="landscape-btn-label">リセット</div>
+            </button>
+            <button class="landscape-btn line-btn" onclick="openLineConsultation()">
+                <div class="landscape-btn-icon"><i class="fa-brands fa-line"></i></div>
+                <div class="landscape-btn-label">相談</div>
+            </button>
+            <button class="landscape-btn" onclick="openOfficialWebsite()">
+                <div class="landscape-btn-icon"><i class="fa-solid fa-house"></i></div>
+                <div class="landscape-btn-label">公式サイト</div>
+            </button>
+        </div>
+        
+        <div style="height: 10px;"></div> <!-- バランス用の余白 -->
+    </aside>
+
+    <!-- 🎛️ Before/After スライダー本体 -->
+    <main class="slide-container" id="slideContainer">
+        <!-- Before画像 (左側、下層) -->
+        <div class="slide-image-wrapper before-image-wrapper">
+            <img id="beforeImg" class="slide-image" src="" alt="A: Before">
+        </div>
+        
+        <!-- After画像 (右側、上層) -->
+        <div class="slide-image-wrapper after-image-wrapper" id="afterImageWrapper">
+            <img id="afterImg" class="slide-image" src="" alt="B: After">
+        </div>
+        
+        <!-- A/B スライドバッジ (画像ラッパーの外に配置して境界線に連動させず画面端に綺麗に固定) -->
+        <span class="slide-label before-label">A: Before</span>
+        <span class="slide-label after-label">B: After</span>
+        
+        <!-- 中央スライドハンドル -->
+        <div class="slider-handle" id="sliderHandle">
+            <div class="slider-button">
+                <i class="fa-solid fa-arrows-left-right"></i>
+            </div>
+        </div>
+    </main>
+
+    <!-- 📱 下段フローティング操作バー (縦画面用) -->
+    <div class="control-bar-wrapper">
+        <nav class="control-bar">
+            <button class="control-btn" id="resetBtn" onclick="resetSlider()">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-solid fa-arrows-left-right"></i>
+                </div>
+                <span class="control-btn-label">リセット</span>
+            </button>
+            
+            <button class="control-btn line-btn" onclick="openLineConsultation()">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-brands fa-line"></i>
+                </div>
+                <span class="control-btn-label">LINE相談</span>
+            </button>
+            
+            <button class="control-btn" onclick="openOfficialWebsite()">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span class="control-btn-label">公式サイト</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ⏳ ローディング overlay -->
+    <div class="loader-overlay show" id="loaderOverlay">
+        <i class="fa-solid fa-circle-notch spinner"></i>
+        <div class="loader-text" id="loaderText">ご提案パース画像を準備中...</div>
+    </div>
+
+    <!-- 📋 トースト通知 -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-info"></i>
+        <span class="toast-msg" id="toastMsg"></span>
+    </div>
+
+    <script>
+        // 🔮 グローバル変数
+        const slideImages = {
+            before: null,
+            after: null
+        };
+        let isDragging = false;
+        let imageCountLoaded = 0;
+
+        // 🔗 URLパラメータのパース (slide_images 補完設計)
+        function parseUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            let beforeParam = params.get('a') || params.get('before');
+            let afterParam = params.get('b') || params.get('after');
+            const folderParam = params.get('f') || params.get('folder');
+            let cleanFolder = null;
+            if (folderParam) {
+                // 安全対策: 親ディレクトリへの移動などを防ぐため、/ や \、.. などを除去
+                cleanFolder = folderParam.replace(/\\/g, '/').split('/').pop().replace(/\.\./g, '').trim();
+            }
+
+            // 🌐 スライドは通常 "slide_images/ファイル名" だが、お施主様フォルダが指定された場合はそこからロード！
+            function cleanToSlidePath(param) {
+                if (!param) return null;
+                let clean = param.trim();
+                
+                // もしフルURLや相対パスが指定されていたら、ファイル名だけを切り取る
+                if (clean.includes('/')) {
+                    const parts = clean.split('/');
+                    clean = parts[parts.length - 1];
+                }
+                
+                if (cleanFolder) {
+                    return `customers/${cleanFolder}/${clean}`;
+                } else {
+                    return `slide_images/${clean}`;
+                }
+            }
+
+            slideImages.before = cleanToSlidePath(beforeParam);
+            slideImages.after = cleanToSlidePath(afterParam);
+
+            const ownerName = params.get('name');
+            if (ownerName) {
+                const nameStr = decodeURIComponent(ownerName);
+                document.getElementById('houseOwnerName').innerHTML = `✨ <b>${nameStr} 様邸</b> ご提案スライド`;
+                document.getElementById('landscapeOwnerBadge').textContent = `${nameStr}様`;
+                document.title = `${nameStr}様邸 ご提案スライド比較 | 長友ホーム`;
+            }
+
+            // 🌐 admin=true がある場合のみ、社内インポートボタンを表示するセーフティ設計！
+            const isAdmin = params.get('admin') === 'true';
+            if (isAdmin) {
+                const btn = document.getElementById('adminImportBtn');
+                const btnL = document.getElementById('adminImportBtnLandscape');
+                if (btn) btn.style.display = 'inline-flex';
+                if (btnL) btnL.style.display = 'inline-flex';
+            }
+        }
+
+        // 📥 社内ツールへのお気に入りインポート転送処理
+        function importToAdminTool() {
+            const params = new URLSearchParams(window.location.search);
+            const beforeVal = params.get('a') || params.get('before') || "";
+            const afterVal = params.get('b') || params.get('after') || "";
+            const ownerName = params.get('name') || "";
+            const folderVal = params.get('f') || params.get('folder') || "";
+
+            // index.htmlの自動インポートURLへ遷移させる！
+            const loc = window.location;
+            const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
+            let targetUrl = `${loc.protocol}//${loc.host}${basePath}/index.html?import=slide&a=${encodeURIComponent(beforeVal)}&b=${encodeURIComponent(afterVal)}&name=${encodeURIComponent(ownerName)}`;
+            if (folderVal) {
+                targetUrl += `&f=${encodeURIComponent(folderVal)}`;
+            }
+            
+            window.location.href = targetUrl;
+        }
+
+        // ⏳ ローダー制御
+        function showLoader(show, text = 'パース画像を準備中...') {
+            const overlay = document.getElementById('loaderOverlay');
+            const textEl = document.getElementById('loaderText');
+            if (!overlay || !textEl) return;
+
+            textEl.textContent = text;
+            if (show) {
+                overlay.classList.add('show');
+            } else {
+                overlay.classList.remove('show');
+            }
+        }
+
+        // 📋 トースト表示
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            if (!toast || !toastMsg) return;
+
+            toastMsg.textContent = msg;
+            toast.querySelector('i').className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-info';
+            toast.style.borderColor = isError ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 🖼️ 画像の読み込み処理と初期位置設定
+        function loadImages() {
+            const beforeImg = document.getElementById('beforeImg');
+            const afterImg = document.getElementById('afterImg');
+
+            if (!slideImages.before || !slideImages.after) {
+                showLoader(false);
+                showToast("⚠️ 比較画像が指定されていません。URLを確認してください。", true);
+                return;
+            }
+
+            function handleLoad() {
+                imageCountLoaded++;
+                if (imageCountLoaded === 2) {
+                    showLoader(false);
+                    // 初期表示アニメーション (50%に滑らかに設定)
+                    animateSlider(50);
+                    showToast("↔️ 画面中央のバーを左右にドラッグして比較できます！");
+                }
+            }
+
+            function handleError(e) {
+                console.error("Image load error:", e);
+                showLoader(false);
+                showToast("❌ パース画像の読み込みに失敗しました。ファイル名が正しいかご確認ください。", true);
+            }
+
+            beforeImg.onload = handleLoad;
+            beforeImg.onerror = handleError;
+            afterImg.onload = handleLoad;
+            afterImg.onerror = handleError;
+
+            beforeImg.src = slideImages.before;
+            afterImg.src = slideImages.after;
+        }
+
+        // ↔️ スライダーの位置更新処理
+        function setSliderPos(x) {
+            const container = document.getElementById('slideContainer');
+            const rect = container.getBoundingClientRect();
+            
+            // コンテナ左端からの相対割合(0〜100%)を計算
+            let pos = ((x - rect.left) / rect.width) * 100;
+            
+            // 境界制限(0%〜100%)
+            if (pos < 0) pos = 0;
+            if (pos > 100) pos = 100;
+            
+            // CSS変数（--slider-pos）を更新
+            document.documentElement.style.setProperty('--slider-pos', `${pos}%`);
+        }
+
+        // 🔄 スライダーのリセット（中央50%へ滑らかに戻すイージングアニメーション）
+        function resetSlider() {
+            const currentPosStr = document.documentElement.style.getPropertyValue('--slider-pos') || '50%';
+            const startPos = parseFloat(currentPosStr);
+            const targetPos = 50;
+            
+            if (startPos === targetPos) {
+                showToast("🎯 すでに中央にリセットされています");
+                return;
+            }
+
+            let start = null;
+            const duration = 400; // 0.4秒でアニメーション
+
+            function step(timestamp) {
+                if (!start) start = timestamp;
+                const progress = timestamp - start;
+                const t = Math.min(progress / duration, 1);
+                
+                // イージング関数 (easeOutQuart)
+                const ease = 1 - Math.pow(1 - t, 4);
+                const current = startPos + (targetPos - startPos) * ease;
+                
+                document.documentElement.style.setProperty('--slider-pos', `${current}%`);
+                
+                if (t < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    showToast("🎯 境界線を中央に戻しました");
+                }
+            }
+            
+            window.requestAnimationFrame(step);
+        }
+
+        // 初期アニメーション用
+        function animateSlider(targetPos) {
+            document.documentElement.style.setProperty('--slider-pos', `0%`);
+            setTimeout(() => {
+                let start = null;
+                const duration = 800; // 0.8秒でふわっと中央へ
+
+                function step(timestamp) {
+                    if (!start) start = timestamp;
+                    const progress = timestamp - start;
+                    const t = Math.min(progress / duration, 1);
+                    const ease = 1 - Math.pow(1 - t, 3); // easeOutCubic
+                    const current = 0 + targetPos * ease;
+                    
+                    document.documentElement.style.setProperty('--slider-pos', `${current}%`);
+                    
+                    if (t < 1) {
+                        window.requestAnimationFrame(step);
+                    }
+                }
+                window.requestAnimationFrame(step);
+            }, 300);
+        }
+
+        // 🖱️ ドラッグイベントリスナーの登録
+        function initDragEvents() {
+            const container = document.getElementById('slideContainer');
+            const handle = document.getElementById('sliderHandle');
+
+            // マウスまたはタッチ押下開始
+            function startDrag(e) {
+                isDragging = true;
+                container.style.cursor = 'ew-resize';
+                updateDrag(e);
+            }
+
+            // ドラッグ終了
+            function stopDrag() {
+                isDragging = false;
+                container.style.cursor = 'default';
+            }
+
+            // 移動中の座標更新
+            function updateDrag(e) {
+                if (!isDragging) return;
+                
+                let clientX;
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                } else {
+                    clientX = e.clientX;
+                }
+                
+                // requestAnimationFrameによる描画負荷軽減
+                window.requestAnimationFrame(() => {
+                    if (isDragging) {
+                        setSliderPos(clientX);
+                    }
+                });
+            }
+
+            // PC用イベント
+            handle.addEventListener('mousedown', startDrag);
+            window.addEventListener('mouseup', stopDrag);
+            window.addEventListener('mousemove', updateDrag);
+
+            // モバイル(タッチ)用イベント (パッシブイベントをfalseにして、スクロール干渉を防止)
+            handle.addEventListener('touchstart', startDrag, { passive: false });
+            window.addEventListener('touchend', stopDrag);
+            window.addEventListener('touchmove', updateDrag, { passive: false });
+            
+            // 画像ドラッグ防止のため、コンテナ全体でのデフォルトタッチ動作を一部防ぐ
+            container.addEventListener('touchmove', function(e) {
+                if (isDragging) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+        }
+
+        // 💬 LINEで相談
+        function openLineConsultation() {
+            const lineUrl = "https://s.lmes.jp/landing-qr/2008950675-i5V03Fmf?uLand=bsLfxz";
+            window.open(lineUrl, '_blank');
+        }
+
+        // 🌐 公式サイト
+        function openOfficialWebsite() {
+            const officialUrl = "https://nagatomo-home.net/";
+            window.open(officialUrl, '_blank');
+        }
+
+        // 🚀 初期起動
+        window.addEventListener('DOMContentLoaded', () => {
+            parseUrlParams();
+            loadImages();
+            initDragEvents();
+        });
+    </script>
+</body>
+</html>

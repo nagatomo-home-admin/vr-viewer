@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ご提案 360° VR パノラマ内覧 | 長友ホーム</title>
+    <!-- 🌐 Pannellum CDN (WebGL 360° パノラマライブラリ) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    
+    <!-- 🎨 Google Fonts & Font Awesome CDN -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --toggle-active: #10b981;
+            --accent: #0ea5e9;
+            --bg-dark: #0f172a;
+            --border-color: rgba(255, 255, 255, 0.15);
+            --header-bg: rgba(15, 23, 42, 0.65);
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+        }
+
+        /* 🌐 360度パノラマビューワー */
+        #panoramaViewer {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* 🛡️ Pannellum の標準ボタンとクレジットの非表示（高級ホテルライク化） */
+        .pnlm-load-box {
+            display: none !important;
+        }
+        .pnlm-about-iframe {
+            display: none !important;
+        }
+
+        /* ✨ プレミアムすりガラス調ウェルカムヘッダー */
+        .header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 10;
+            padding: 1.0rem 1.5rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(16px) saturate(140%);
+            -webkit-backdrop-filter: blur(16px) saturate(140%);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .logo-img {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: contain;
+            padding: 3px;
+            box-sizing: border-box;
+            background-color: #ffffff;
+        }
+
+        .logo-text-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.1rem;
+        }
+
+        .logo-title {
+            font-family: 'Outfit', 'Noto Sans JP', sans-serif;
+            font-weight: 800;
+            font-size: 0.9rem;
+            letter-spacing: 0.08em;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .logo-title span {
+            color: var(--accent);
+        }
+
+        .house-owner-name {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.05em;
+        }
+
+        .current-plan-badge {
+            background: rgba(14, 165, 233, 0.15);
+            border: 1px solid rgba(14, 165, 233, 0.35);
+            color: var(--accent);
+            padding: 0.35rem 0.7rem;
+            border-radius: 99px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            box-shadow: 0 2px 10px rgba(14, 165, 233, 0.1);
+            transition: all 0.3s;
+        }
+
+        .current-plan-badge.plan2 {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.35);
+            color: var(--toggle-active);
+        }
+
+        /* 📥 社内インポートバッジ (極上のすりガラス仕様) */
+        .admin-import-badge {
+            background: rgba(16, 185, 129, 0.18);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: var(--toggle-active);
+            padding: 0.35rem 0.75rem;
+            border-radius: 99px;
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.15);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            transition: all 0.2s;
+            outline: none;
+        }
+        .admin-import-badge:active {
+            transform: scale(0.95);
+            background: rgba(16, 185, 129, 0.3);
+        }
+
+        /* 📱 下段フローティング操作バー (Glassmorphism・親指タッチ最適化) */
+        .control-bar-wrapper {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            width: 90%;
+            max-width: 500px;
+        }
+
+        .control-bar {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(18px) saturate(160%);
+            -webkit-backdrop-filter: blur(18px) saturate(160%);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 0.75rem 1rem;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            gap: 0.5rem;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.35rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 14px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .control-btn:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .control-btn-icon-circle {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 1.0rem;
+        }
+
+        .control-btn-label {
+            font-size: 0.62rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+            transition: all 0.25s;
+        }
+
+        /* アクティブ・ホバー効果 */
+        .control-btn:hover .control-btn-icon-circle {
+            background: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+        }
+
+        .control-btn.active .control-btn-icon-circle {
+            background: var(--primary);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+            color: #ffffff;
+        }
+
+        .control-btn.active .control-btn-label {
+            color: var(--primary);
+        }
+
+        /* 特別なボタン（相談・LINE） */
+        .control-btn.line-btn .control-btn-icon-circle {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: var(--toggle-active);
+        }
+        
+        .control-btn.line-btn .control-btn-label {
+            color: var(--toggle-active);
+        }
+
+        /* ⏳ ローディングガラススピナー */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s;
+        }
+
+        .loader-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .spinner {
+            animation: spin 1s linear infinite;
+            color: var(--accent);
+            font-size: 2.2rem;
+        }
+
+        .loader-text {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: 0.05em;
+        }
+
+        /* 📋 プレミアム通知トースト */
+        .toast {
+            position: absolute;
+            top: 5rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-20px);
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.4rem;
+            border-radius: 16px;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+            pointer-events: auto;
+        }
+
+        .toast i {
+            color: var(--toggle-active);
+        }
+
+        .toast-msg {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 📱 横画面用（Landscape）左端すりガラスサイドバー (通常時は非表示) */
+        .landscape-sidebar {
+            display: none;
+        }
+
+        /* 📱 スマホ横画面（Landscape）時の極上集約レスポンシブデザイン */
+        @media (orientation: landscape) and (max-height: 500px) {
+            body {
+                display: flex;
+                flex-direction: row;
+            }
+
+            .header {
+                display: none !important;
+            }
+
+            /* 左端に縦型すりガラスサイドバーを集約 */
+            .landscape-sidebar {
+                display: flex !important;
+                flex-direction: column;
+                width: 80px;
+                height: 100vh;
+                background: rgba(15, 23, 42, 0.85);
+                backdrop-filter: blur(20px) saturate(140%);
+                -webkit-backdrop-filter: blur(20px) saturate(140%);
+                border-right: 1px solid var(--border-color);
+                z-index: 50;
+                align-items: center;
+                justify-content: space-between;
+                padding: 0.5rem 0;
+                box-shadow: 4px 0 30px rgba(0,0,0,0.4);
+            }
+
+            .landscape-logo-container {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.1rem;
+                width: 100%;
+            }
+
+            .landscape-logo {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                object-fit: contain;
+                padding: 3px;
+                box-sizing: border-box;
+                background-color: #ffffff;
+            }
+
+            .landscape-owner-badge {
+                font-size: 0.45rem;
+                font-weight: 700;
+                color: var(--accent);
+                text-align: center;
+                max-width: 72px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+
+            .landscape-plan-badge {
+                font-size: 0.5rem;
+                font-weight: 800;
+                padding: 0.1rem 0.35rem;
+                background: rgba(14, 165, 233, 0.15);
+                border: 1px solid rgba(14, 165, 233, 0.35);
+                color: var(--accent);
+                border-radius: 4px;
+                margin-top: 0.1rem;
+            }
+
+            .landscape-plan-badge.plan2 {
+                background: rgba(16, 185, 129, 0.15);
+                border: 1px solid rgba(16, 185, 129, 0.35);
+                color: var(--toggle-active);
+            }
+
+            .landscape-menu {
+                display: flex;
+                flex-direction: column;
+                gap: 0.3rem;
+                align-items: center;
+                width: 100%;
+            }
+
+            .landscape-btn {
+                background: transparent;
+                border: none;
+                color: var(--text-main);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 0.15rem;
+                cursor: pointer;
+                width: 100%;
+                padding: 0.25rem 0;
+                transition: all 0.2s;
+            }
+
+            .landscape-btn-icon {
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.08);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                border: 1px solid rgba(255,255,255,0.05);
+                transition: all 0.2s;
+            }
+
+            .landscape-btn-label {
+                font-size: 0.5rem;
+                font-weight: 700;
+                color: var(--text-muted);
+            }
+
+            .landscape-btn:hover .landscape-btn-icon {
+                background: rgba(255,255,255,0.15);
+                color: #ffffff;
+            }
+
+            .landscape-btn:active .landscape-btn-icon {
+                transform: scale(0.9);
+            }
+
+            .landscape-btn.active .landscape-btn-icon {
+                background: var(--primary);
+                border-color: var(--primary);
+                box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+                color: #ffffff;
+            }
+
+            .landscape-btn.active .landscape-btn-label {
+                color: var(--primary);
+            }
+
+            .landscape-btn.line-btn .landscape-btn-icon {
+                background: rgba(16, 185, 129, 0.15);
+                color: var(--toggle-active);
+                border-color: rgba(16, 185, 129, 0.3);
+            }
+            .landscape-btn.line-btn .landscape-btn-label {
+                color: var(--toggle-active);
+            }
+
+            /* パノラマビューワーを右側に全画面寄せる */
+            #panoramaViewer {
+                top: 0 !important;
+                left: 80px !important;
+                width: calc(100% - 80px) !important;
+                height: 100vh !important;
+            }
+
+            .control-bar-wrapper {
+                display: none !important; /* 標準のフッターは非表示 */
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header {
+                padding: 0.8rem 1.0rem;
+            }
+            .control-bar-wrapper {
+                bottom: 1rem;
+                width: 94%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ✨ プレミアムすりガラスヘッダー (縦画面用) -->
+    <header class="header">
+        <div class="logo-area">
+            <img src="images/logo.png" alt="長友ホーム" class="logo-img">
+            <div class="logo-text-group">
+                <h1 class="logo-title">Nagatomo<span>Home</span> VR</h1>
+                <div class="house-owner-name" id="houseOwnerName">ご提案パノラマ内覧</div>
+            </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <!-- 📥 社内インポートボタン (合言葉 admin=true 検知時のみ表示) -->
+            <button id="adminImportBtn" onclick="importToAdminTool()" class="admin-import-badge" style="display: none;">
+                📥 社内登録
+            </button>
+            <div class="current-plan-badge" id="planBadge">A</div>
+        </div>
+    </header>
+
+    <!-- 📱 スマホ横画面（Landscape）用の左端すりガラスサイドバー -->
+    <aside class="landscape-sidebar">
+        <div class="landscape-logo-container">
+            <img src="images/logo.png" alt="長友ホーム" class="landscape-logo">
+            <div class="landscape-owner-badge" id="landscapeOwnerBadge">ご提案</div>
+            
+            <!-- 📥 社内インポートボタン (横画面用・合言葉検知時のみ表示) -->
+            <button id="adminImportBtnLandscape" onclick="importToAdminTool()" class="landscape-btn" style="display: none; color: var(--toggle-active); margin: 0.2rem 0;">
+                <div class="landscape-btn-icon" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.3);"><i class="fa-solid fa-download"></i></div>
+                <div class="landscape-btn-label" style="color: var(--toggle-active); font-size: 0.48rem;">社内登録</div>
+            </button>
+
+            <div class="landscape-plan-badge" id="landscapePlanBadge">Aプラン</div>
+        </div>
+        
+        <div class="landscape-menu">
+            <!-- 切替 -->
+            <button class="landscape-btn" onclick="togglePanoPlan()">
+                <div class="landscape-btn-icon"><i class="fa-solid fa-arrows-rotate"></i></div>
+                <div class="landscape-btn-label">切替</div>
+            </button>
+            <!-- ジャイロ -->
+            <button class="landscape-btn" id="gyroBtnLandscape" onclick="togglePanoGyro()">
+                <div class="landscape-btn-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                <div class="landscape-btn-label">ジャイロ</div>
+            </button>
+            <!-- リセット -->
+            <button class="landscape-btn" onclick="resetPanoView()">
+                <div class="landscape-btn-icon"><i class="fa-solid fa-crosshairs"></i></div>
+                <div class="landscape-btn-label">リセット</div>
+            </button>
+            <!-- 相談 -->
+            <button class="landscape-btn line-btn" onclick="openLineConsultation()">
+                <div class="landscape-btn-icon"><i class="fa-brands fa-line"></i></div>
+                <div class="landscape-btn-label">相談</div>
+            </button>
+            <!-- 公式サイト -->
+            <button class="landscape-btn" onclick="openOfficialWebsite()">
+                <div class="landscape-btn-icon"><i class="fa-solid fa-house"></i></div>
+                <div class="landscape-btn-label">公式サイト</div>
+            </button>
+        </div>
+        
+        <div style="height: 5px;"></div>
+    </aside>
+
+    <!-- 🌐 360° VRビューワー -->
+    <div id="panoramaViewer"></div>
+
+    <!-- ⏳ ローディングスピナー -->
+    <div class="loader-overlay show" id="loaderOverlay">
+        <i class="fa-solid fa-circle-notch spinner"></i>
+        <div class="loader-text" id="loaderText">360°パノラマ空間を生成中...</div>
+    </div>
+
+    <!-- 📋 トースト通知 -->
+    <div class="toast" id="toast">
+        <i class="fa-solid fa-circle-info"></i>
+        <span class="toast-msg" id="toastMsg">読み込みが完了しました</span>
+    </div>
+
+    <!-- 📱 下部フローティングコントロールバー (縦画面用) -->
+    <div class="control-bar-wrapper">
+        <nav class="control-bar">
+            <!-- 🔄 プラン切替 -->
+            <button class="control-btn" onclick="togglePanoPlan()" title="A/B プラン切り替え">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-solid fa-arrows-rotate"></i>
+                </div>
+                <span class="control-btn-label">切替</span>
+            </button>
+
+            <!-- 📱 ジャイロ連動 -->
+            <button class="control-btn" id="gyroBtn" onclick="togglePanoGyro()" title="ジャイロ操作">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-solid fa-mobile-screen-button"></i>
+                </div>
+                <span class="control-btn-label">ジャイロ</span>
+            </button>
+
+            <!-- 🎯 視点リセット -->
+            <button class="control-btn" onclick="resetPanoView()" title="アングルを初期位置に戻す">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-solid fa-crosshairs"></i>
+                </div>
+                <span class="control-btn-label">リセット</span>
+            </button>
+
+            <!-- 💬 LINEで相談 -->
+            <button class="control-btn line-btn" onclick="openLineConsultation()" title="公式LINEで担当に相談">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-brands fa-line"></i>
+                </div>
+                <span class="control-btn-label">LINE相談</span>
+            </button>
+
+            <!-- 🌐 公式サイト -->
+            <button class="control-btn" onclick="openOfficialWebsite()" title="長友ホームのホームページへ">
+                <div class="control-btn-icon-circle">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span class="control-btn-label">公式サイト</span>
+            </button>
+        </nav>
+    </div>
+
+    <script>
+        // 🔮 グローバル変数
+        const panoImages = {
+            before: null,
+            after: null
+        };
+        let currentPanoType = 'before';
+        window.viewer = null;
+        window.panoGyroEnabled = false;
+
+        function parseUrlParams() {
+            const params = new URLSearchParams(window.location.search);
+            let beforeParam = params.get('a') || params.get('before');
+            let afterParam = params.get('b') || params.get('after');
+            const folderParam = params.get('f') || params.get('folder');
+            let cleanFolder = null;
+            if (folderParam) {
+                // 安全対策: 親ディレクトリへの移動などを防ぐため、/ や \、.. などを除去
+                cleanFolder = folderParam.replace(/\\/g, '/').split('/').pop().replace(/\.\./g, '').trim();
+            }
+
+            // 🌐 パノラマは通常 "images/ファイル名" だが、お施主様フォルダが指定された場合はそこからロード！
+            function cleanToPanoPath(param) {
+                if (!param) return null;
+                let clean = param.trim();
+                
+                // もしフルURLや相対パスが指定されていたら、ファイル名だけを切り取る
+                if (clean.includes('/')) {
+                    const parts = clean.split('/');
+                    clean = parts[parts.length - 1];
+                }
+                
+                if (cleanFolder) {
+                    return `customers/${cleanFolder}/${clean}`;
+                } else {
+                    return `images/${clean}`;
+                }
+            }
+
+            panoImages.before = cleanToPanoPath(beforeParam);
+            panoImages.after = cleanToPanoPath(afterParam);
+            
+            const ownerName = params.get('name');
+            if (ownerName) {
+                const nameStr = decodeURIComponent(ownerName);
+                document.getElementById('houseOwnerName').innerHTML = `✨ <b>${nameStr} 様邸</b> ご提案パノラマ`;
+                document.getElementById('landscapeOwnerBadge').textContent = `${nameStr}様`;
+                document.title = `${nameStr}様邸 ご提案パノラマ内覧 | 長友ホーム`;
+            }
+
+            // 🌐 admin=true がある場合のみ、社内インポートボタンを表示するセーフティ設計！
+            const isAdmin = params.get('admin') === 'true';
+            if (isAdmin) {
+                const btn = document.getElementById('adminImportBtn');
+                const btnL = document.getElementById('adminImportBtnLandscape');
+                if (btn) btn.style.display = 'inline-flex';
+                if (btnL) btnL.style.display = 'inline-flex';
+            }
+        }
+
+        // 📥 社内ツールへのお気に入りインポート転送処理
+        function importToAdminTool() {
+            const params = new URLSearchParams(window.location.search);
+            const beforeVal = params.get('a') || params.get('before') || "";
+            const afterVal = params.get('b') || params.get('after') || "";
+            const ownerName = params.get('name') || "";
+            const folderVal = params.get('f') || params.get('folder') || "";
+
+            // index.htmlの自動インポートURLへ遷移させる！
+            const loc = window.location;
+            const basePath = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
+            let targetUrl = `${loc.protocol}//${loc.host}${basePath}/index.html?import=pano&a=${encodeURIComponent(beforeVal)}&b=${encodeURIComponent(afterVal)}&name=${encodeURIComponent(ownerName)}`;
+            if (folderVal) {
+                targetUrl += `&f=${encodeURIComponent(folderVal)}`;
+            }
+            
+            window.location.href = targetUrl;
+        }
+
+        function showLoader(show, text = '360°パノラマ空間を生成中...') {
+            const overlay = document.getElementById('loaderOverlay');
+            const textEl = document.getElementById('loaderText');
+            if (!overlay || !textEl) return;
+            textEl.textContent = text;
+            show ? overlay.classList.add('show') : overlay.classList.remove('show');
+        }
+
+        function showToast(msg, isError = false) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            if (!toast || !toastMsg) return;
+            toastMsg.textContent = msg;
+            toast.querySelector('i').className = isError ? 'fa-solid fa-circle-exclamation' : 'fa-solid fa-circle-info';
+            toast.style.borderColor = isError ? '#ef4444' : 'rgba(255, 255, 255, 0.15)';
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 3000);
+        }
+
+        function initPanoViewer(imageUrl, pitch = 0, yaw = 0, hfov = 95) {
+            showLoader(true);
+            if (window.viewer) {
+                try { window.viewer.destroy(); } catch (e) { console.error(e); }
+                window.viewer = null;
+            }
+            try {
+                window.viewer = pannellum.viewer('panoramaViewer', {
+                    "type": "equirectangular",
+                    "panorama": imageUrl,
+                    "autoLoad": true,
+                    "compass": false,
+                    "showZoomCtrl": false,
+                    "showFullscreenCtrl": false,
+                    "keyboardZoom": false,
+                    "pitch": pitch,
+                    "yaw": yaw,
+                    "hfov": hfov,
+                    "maxPitch": 60,
+                    "minPitch": -60,
+                    "autoRotate": 0
+                });
+                window.viewer.on('load', () => {
+                    showLoader(false);
+                    if (window.panoGyroEnabled && typeof window.viewer.startOrientation === 'function') {
+                        try { window.viewer.startOrientation(); } catch (e) { console.error(e); }
+                    }
+                });
+            } catch (e) {
+                showLoader(false);
+                showToast("❌ 初期化エラー", true);
+            }
+        }
+
+        function togglePanoPlan() {
+            if (!panoImages.before && !panoImages.after) return;
+            const nextType = currentPanoType === 'before' ? 'after' : 'before';
+            const nextUrl = panoImages[nextType];
+            if (!nextUrl) { showToast(`❌ ${nextType === 'before' ? 'A' : 'B'}は設定されていません`, true); return; }
+            currentPanoType = nextType;
+            const badge = document.getElementById('planBadge');
+            const lBadge = document.getElementById('landscapePlanBadge');
+            if (nextType === 'before') {
+                if(badge){ badge.textContent = "A"; badge.classList.remove('plan2'); }
+                if(lBadge){ lBadge.textContent = "Aプラン"; lBadge.classList.remove('plan2'); }
+            } else {
+                if(badge){ badge.textContent = "B"; badge.classList.add('plan2'); }
+                if(lBadge){ lBadge.textContent = "Bプラン"; lBadge.classList.add('plan2'); }
+            }
+            let pitch = 0, yaw = 0, hfov = 95;
+            if (window.viewer) { pitch = window.viewer.getPitch(); yaw = window.viewer.getYaw(); hfov = window.viewer.getHfov(); }
+            initPanoViewer(nextUrl, pitch, yaw, hfov);
+            showToast(`🔄 ${nextType === 'before' ? 'A' : 'B'} に切り替えました`);
+        }
+
+        function togglePanoGyro() {
+            const btn = document.getElementById('gyroBtn');
+            const btnL = document.getElementById('gyroBtnLandscape');
+            if (!window.viewer) return;
+            if (window.panoGyroEnabled) {
+                window.panoGyroEnabled = false;
+                if(btn) btn.classList.remove('active');
+                if(btnL) btnL.classList.remove('active');
+                try { window.viewer.stopOrientation(); } catch (e) { console.error(e); }
+                showToast("ジャイロ連動をOFFにしました");
+            } else {
+                if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                    DeviceOrientationEvent.requestPermission().then(state => {
+                        if (state === 'granted') enableGyro(btn, btnL);
+                    }).catch(err => { showToast("❌ ジャイロ起動エラー", true); });
+                } else {
+                    enableGyro(btn, btnL);
+                }
+            }
+        }
+
+        function enableGyro(btn, btnL) {
+            window.panoGyroEnabled = true;
+            if(btn) btn.classList.add('active');
+            if(btnL) btnL.classList.add('active');
+            try { window.viewer.startOrientation(); showToast("📱 ジャイロ連動開始"); } catch (e) { window.panoGyroEnabled = false; }
+        }
+
+        function resetPanoView() {
+            if (window.viewer) {
+                // 📱 もしジャイロがONなら、連動を安全に解除する！
+                if (window.panoGyroEnabled) {
+                    window.panoGyroEnabled = false;
+                    const btn = document.getElementById('gyroBtn');
+                    const btnL = document.getElementById('gyroBtnLandscape');
+                    if (btn) btn.classList.remove('active');
+                    if (btnL) btnL.classList.remove('active');
+                    try { window.viewer.stopOrientation(); } catch (e) { console.error(e); }
+                }
+                
+                // 🎯 視点を正面に戻す
+                window.viewer.setPitch(0, true);
+                window.viewer.setYaw(0, true);
+                window.viewer.setHfov(95, true);
+                showToast("🎯 視点を正面に戻しました（ジャイロ連動解除）");
+            }
+        }
+
+        // 💬 LINEで相談
+        function openLineConsultation() {
+            const lineUrl = "https://s.lmes.jp/landing-qr/2008950675-i5V03Fmf?uLand=bsLfxz";
+            window.open(lineUrl, '_blank');
+        }
+
+        // 🌐 公式サイト
+        function openOfficialWebsite() {
+            const officialUrl = "https://nagatomo-home.net/";
+            window.open(officialUrl, '_blank');
+        }
+
+        // 🚀 初期ロード (パノラマ画像は厳格に images/ フォルダから固定ロード！)
+        window.addEventListener('DOMContentLoaded', () => {
+            parseUrlParams();
+            
+            const startUrl = panoImages.before || panoImages.after;
+            if (startUrl) {
+                if (!panoImages.before && panoImages.after) {
+                    currentPanoType = 'after';
+                    const badge = document.getElementById('planBadge');
+                    if (badge) {
+                        badge.textContent = "B";
+                        badge.classList.add('plan2');
+                    }
+                }
+                initPanoViewer(startUrl);
+            } else {
+                showLoader(false);
+                showToast("⚠️ パノラマ画像URLがありません。リンクを確認してください。", true);
+            }
+        });
+    </script>
+</body>
+</html>
