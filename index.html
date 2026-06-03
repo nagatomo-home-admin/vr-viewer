@@ -1713,9 +1713,93 @@
                 padding-top: 1.5rem;
             }
         }
+
+        /* 🚀 追従型フローティングサイドメニュー（タブ切り替え） */
+        .floating-sidebar {
+            position: fixed;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 0.8rem 0.5rem;
+            box-shadow: 0 10px 30px rgba(148, 163, 184, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 999;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .sidebar-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 0.6rem 0.4rem;
+            font-weight: 600;
+            border-radius: 14px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 0.2rem;
+            width: 76px;
+            height: 72px;
+            transition: all 0.2s ease;
+            text-align: center;
+            font-size: 1.3rem;
+            line-height: 1;
+        }
+        
+        .sidebar-btn:hover {
+            background: rgba(99, 102, 241, 0.06);
+            color: var(--primary);
+            transform: scale(1.05);
+        }
+        
+        .sidebar-btn.active {
+            background: #ffffff;
+            color: var(--primary-hover);
+            box-shadow: 0 4px 12px rgba(148, 163, 184, 0.12);
+        }
+
+        /* 画面幅が狭い時はサイドメニューを非表示にして邪魔にならないようにする */
+        @media (max-width: 1240px) {
+            .floating-sidebar {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 <body>
+
+    <!-- 🚀 追従型フローティングサイドメニュー -->
+    <div class="floating-sidebar">
+        <button class="sidebar-btn active" id="sidebar-tab-interior" onclick="switchTab('interior')" title="室内パース (Interior)">
+            🛋️
+            <span style="font-size: 0.65rem; font-weight: 700; margin-top: 2px;">室内パース</span>
+        </button>
+        <button class="sidebar-btn" id="sidebar-tab-exterior" onclick="switchTab('exterior')" title="外観パース (Exterior)">
+            🏡
+            <span style="font-size: 0.65rem; font-weight: 700; margin-top: 2px;">外観パース</span>
+        </button>
+        <button class="sidebar-btn" id="sidebar-tab-transition" onclick="switchTab('transition')" title="リフォーム動画 (Transition)">
+            🎬
+            <span style="font-size: 0.65rem; font-weight: 700; margin-top: 2px;">動画生成</span>
+        </button>
+        <button class="sidebar-btn" id="sidebar-tab-comparison" onclick="switchTab('comparison')" title="劇的スライド比較 (Slider)">
+            ⭐
+            <span style="font-size: 0.65rem; font-weight: 700; margin-top: 2px;">スライド比較</span>
+        </button>
+        <button class="sidebar-btn" id="sidebar-tab-panorama" onclick="switchTab('panorama')" title="360° VRパノラマ (VR)">
+            🌐
+            <span style="font-size: 0.65rem; font-weight: 700; margin-top: 2px;">360°VR</span>
+        </button>
+    </div>
 
     <!-- 横スクロールと無駄スペースを完全に封じ込める固定背景コンテナ -->
     <div class="bg-orb-container">
@@ -3056,6 +3140,11 @@
             
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 if (btn.id === `tab-${tabName}`) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+
+            document.querySelectorAll('.sidebar-btn').forEach(btn => {
+                if (btn.id === `sidebar-tab-${tabName}`) btn.classList.add('active');
                 else btn.classList.remove('active');
             });
 
@@ -5994,6 +6083,7 @@
             const modal = document.getElementById('folderLoadModal');
             if (modal) {
                 modal.classList.add('active');
+                document.body.style.overflow = 'hidden'; // 背景スクロールを防止
                 // モーダルを開いたタイミングでお施主様フォルダを動的取得
                 fetchGithubCustomerFolders();
             }
@@ -6001,7 +6091,10 @@
 
         function closeFolderLoadModal() {
             const modal = document.getElementById('folderLoadModal');
-            if (modal) modal.classList.remove('active');
+            if (modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = ''; // 背景スクロールを解除
+            }
         }
 
         // ドラッグ＆ドロップイベントの設定と再帰スキャン
