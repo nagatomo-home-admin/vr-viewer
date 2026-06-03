@@ -6,6 +6,7 @@ echo.
 
 cd /d "%~dp0"
 
+:: [Safety Lock 1] Verify parent customers folder exists
 if not exist "..\customers" (
     echo [ERROR] The parent "customers" folder does not exist!
     echo Sync has been aborted to protect your online data.
@@ -14,6 +15,7 @@ if not exist "..\customers" (
     exit /b
 )
 
+:: [Safety Lock 2] Verify parent customers folder is not empty
 dir /b /a "..\customers" 2>nul | findstr "^" >nul
 if %errorlevel% neq 0 (
     echo [ERROR] The parent "customers" folder is empty!
@@ -29,8 +31,8 @@ copy /y "..\share_slide.html" "share_slide.html" >nul 2>&1
 copy /y "..\index.html" "index.html" >nul 2>&1
 copy /y "..\Flowプロンプトジェネレーター.html" "Flowプロンプトジェネレーター.html" >nul 2>&1
 
-echo [2/4] Syncing customer folders...
-xcopy /s /e /y /d "..\customers" "customers\" >nul 2>&1
+echo [2/4] Syncing customer folders (Mirror Mode)...
+robocopy "..\customers" "customers" /mir /ndl /nfl /np >nul 2>&1
 
 echo [3/4] Checking repository status...
 git rev-parse --is-inside-work-tree >nul 2>&1
