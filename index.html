@@ -1547,29 +1547,26 @@
             <div class="subtitle">最先端AIの力を引き出し、設計パースから極上のVRパノラマを自動生成する統合ツール</div>
         </div>
         
-        <div class="header-actions">
-            <!-- 📁 お施主様フォルダ一括ロードボタンと説明ポップオーバーのグループ -->
-            <div style="position: relative; display: flex; flex-direction: column; gap: 0.5rem; width: 280px;">
+        <div class="header-actions" style="width: 326px;">
+            <!-- 📁 お施主様フォルダロード（ローカル・GitHub統合）と説明ポップオーバーのグループ -->
+            <div style="position: relative; display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
-                    <button class="flow-link-btn" onclick="triggerFolderSelect()" style="flex: 1; background: rgba(14, 165, 233, 0.06); border-color: var(--accent); color: var(--accent); justify-content: center; height: 38px; border-radius: 12px; font-size: 0.8rem; border-width: 1.5px;">
-                        <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; margin-right: 3px;">
-                            <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
-                        </svg>
-                        📁 ローカルフォルダロード
-                    </button>
+                    <!-- 📂 ローカル・GitHub統合セレクトボックス -->
+                    <div class="select-wrapper" style="flex: 1;">
+                        <select id="folderLoadSelect" onchange="handleFolderLoadSelect(this.value)" style="height: 38px; padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.8rem; border-color: var(--accent); background: rgba(255, 255, 255, 0.75); border-radius: 12px; border-width: 1.5px; color: var(--accent); font-weight: 600;">
+                            <option value="">📂 お施主様フォルダをロード...</option>
+                            <option value="local">💻 ローカルPCからロード... (フォルダ選択)</option>
+                            <optgroup label="🌐 GitHubからロード... (読込中 ⏳)" id="githubFoldersGroup">
+                                <!-- JavaScriptで動的に追加されます -->
+                            </optgroup>
+                        </select>
+                    </div>
                     <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
                     
                     <!-- 💡 説明用ヘルプボタン -->
                     <button class="settings-gear-btn" id="folderRuleHelpBtn" onclick="toggleFolderRuleHelp(event)" style="border-color: var(--accent); color: var(--accent); flex-shrink: 0; background: rgba(14, 165, 233, 0.06); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; border-width: 1.5px;" title="ファイル命名ルールを表示">
                         💡
                     </button>
-                </div>
-
-                <!-- 🌐 GitHubオンラインロード用セレクトボックス -->
-                <div class="select-wrapper" style="width: 100%;">
-                    <select id="githubFolderSelect" onchange="handleGithubFolderSelect(this.value)" style="height: 38px; padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.8rem; border-color: var(--accent); background: rgba(255, 255, 255, 0.75); border-radius: 12px; border-width: 1.5px; color: var(--accent); font-weight: 600;">
-                        <option value="">🌐 GitHubからロード... (読込中 ⏳)</option>
-                    </select>
                 </div>
                 
                 <!-- 💡 説明ポップオーバー（すりガラス風） -->
@@ -1578,7 +1575,7 @@
                         💡 フォルダ一括ロード時のファイル命名ルール
                     </div>
                     <p style="font-size: 0.72rem; color: var(--text-muted); line-height: 1.5; margin: 0;">
-                        お施主様フォルダを選択するだけで、以下の命名ルールに基づき画像が自動的にスライドおよびVRパノラマへ振り分けロードされます。<br><br>
+                        お施主様フォルダを選択するだけで、以下の命名ルールに基づき画像が自动的にスライドおよびVRパノラマへ振り分けロードされます。<br><br>
                         ・<strong>スライド（提案前）</strong>：ファイル名に <code>before</code> または <code>slide_before</code> を含む画像<br>
                         ・<strong>スライド（完成）</strong>：ファイル名に <code>after</code> または <code>slide_after</code> を含む画像<br>
                         ・<strong>パノラマVR（A）</strong>：ファイル名に <code>pano_before</code>, <code>pano_a</code>（※<code>pano_after</code>は除く）、または <code>before</code> と <code>pano</code> の両方を含む画像<br>
@@ -1588,7 +1585,7 @@
             </div>
 
             <!-- Flowボタン -->
-            <a href="https://labs.google/fx/ja/tools/flow" target="_blank" class="flow-link-btn" id="flowLink" style="width: 280px; justify-content: center; height: 38px; box-sizing: border-box; border-radius: 12px; font-size: 0.8rem; border-width: 1.5px;">
+            <a href="https://labs.google/fx/ja/tools/flow" target="_blank" class="flow-link-btn" id="flowLink" style="width: 100%; justify-content: center; height: 38px; box-sizing: border-box; border-radius: 12px; font-size: 0.8rem; border-width: 1.5px;">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z"/>
                 </svg>
@@ -5812,10 +5809,21 @@
             window.panoWebUrls = { before: "", after: "" };
         }
 
+        // ドロップダウンからロード先（ローカル or GitHub）が選ばれた時のハンドラ
+        function handleFolderLoadSelect(value) {
+            if (value === "local") {
+                triggerFolderSelect();
+                document.getElementById('folderLoadSelect').value = ""; // 選択をプレースホルダーに戻す
+            } else if (value) {
+                handleGithubFolderSelect(value);
+            }
+        }
+
         // GitHub APIから顧客フォルダ一覧を動的取得
         async function fetchGithubCustomerFolders() {
-            const selectEl = document.getElementById('githubFolderSelect');
-            if (!selectEl) return;
+            const selectEl = document.getElementById('folderLoadSelect');
+            const groupEl = document.getElementById('githubFoldersGroup');
+            if (!selectEl || !groupEl) return;
 
             try {
                 // パブリックリポジトリのためトークンなしで contents API を利用可能
@@ -5828,14 +5836,16 @@
                 // フォルダのみを抽出
                 const folders = data.filter(item => item.type === 'dir').map(item => item.name);
                 
-                // 選択肢のクリアとデフォルトメッセージ
-                selectEl.innerHTML = '<option value="">🌐 GitHubからロード...</option>';
+                // 選択肢のクリア
+                groupEl.innerHTML = '';
+                groupEl.label = "🌐 GitHub（オンライン）からロード";
                 
                 if (folders.length === 0) {
                     const opt = document.createElement('option');
                     opt.value = "";
                     opt.textContent = "顧客フォルダが見つかりません";
-                    selectEl.appendChild(opt);
+                    opt.disabled = true;
+                    groupEl.appendChild(opt);
                     return;
                 }
 
@@ -5846,14 +5856,15 @@
                     const opt = document.createElement('option');
                     opt.value = folder;
                     opt.textContent = folder;
-                    selectEl.appendChild(opt);
+                    groupEl.appendChild(opt);
                 });
 
                 console.log(`[GitHub API] 顧客フォルダを ${folders.length} 件ロードしました。`);
 
             } catch (err) {
                 console.error("[GitHub API] フォルダ一覧の取得に失敗しました:", err);
-                selectEl.innerHTML = '<option value="">🌐 GitHubロード失敗 (再読込はリロードしてください)</option>';
+                groupEl.innerHTML = '<option value="" disabled>取得失敗 (再読込はリロードしてください)</option>';
+                groupEl.label = "🌐 GitHub（オンライン）からロード (失敗)";
                 showToast("❌ GitHubから顧客フォルダ一覧を取得できませんでした", "#ef4444");
             }
         }
@@ -5865,8 +5876,8 @@
             console.log(`[GitHub API] 顧客フォルダ選択: ${folderName}`);
             
             // UI上のローディング表示を表示
-            const selectEl = document.getElementById('githubFolderSelect');
-            selectEl.disabled = true;
+            const selectEl = document.getElementById('folderLoadSelect');
+            if (selectEl) selectEl.disabled = true;
             
             // 顧客名の進捗名をセット
             currentFolderProgressName = folderName;
@@ -5889,8 +5900,10 @@
 
                 if (imageItems.length === 0) {
                     showToast("❌ フォルダ内に対象の画像ファイルが見つかりません", "#ef4444");
-                    selectEl.disabled = false;
-                    selectEl.value = "";
+                    if (selectEl) {
+                        selectEl.disabled = false;
+                        selectEl.value = "";
+                    }
                     return;
                 }
 
@@ -5914,8 +5927,10 @@
 
                 if (filesList.length === 0) {
                     showToast("❌ 画像のダウンロードに失敗しました", "#ef4444");
-                    selectEl.disabled = false;
-                    selectEl.value = "";
+                    if (selectEl) {
+                        selectEl.disabled = false;
+                        selectEl.value = "";
+                    }
                     return;
                 }
 
@@ -5926,8 +5941,10 @@
                 console.error("[GitHub API] 画像一括ロードエラー:", err);
                 showToast("❌ GitHubからの画像ロード中にエラーが発生しました", "#ef4444");
             } finally {
-                selectEl.disabled = false;
-                selectEl.value = ""; // 選択をクリアして再選択可能にする
+                if (selectEl) {
+                    selectEl.disabled = false;
+                    selectEl.value = ""; // 選択をクリアして再選択可能にする
+                }
             }
         }
 
