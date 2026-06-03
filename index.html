@@ -1551,7 +1551,7 @@
             <!-- 📁 お施主様フォルダ一括ロードボタンと説明ポップオーバーのグループ -->
             <div style="position: relative; display: flex; flex-direction: column; gap: 0.5rem; width: 280px;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
-                    <button class="flow-link-btn" onclick="triggerFolderSelect()" style="flex: 1; background: rgba(14, 165, 233, 0.06); border-color: var(--accent); color: var(--accent); justify-content: center; height: 38px;">
+                    <button class="flow-link-btn" onclick="triggerFolderSelect()" style="flex: 1; background: rgba(14, 165, 233, 0.06); border-color: var(--accent); color: var(--accent); justify-content: center; height: 38px; border-radius: 12px; font-size: 0.8rem; border-width: 1.5px;">
                         <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; margin-right: 3px;">
                             <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
                         </svg>
@@ -1560,14 +1560,14 @@
                     <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
                     
                     <!-- 💡 説明用ヘルプボタン -->
-                    <button class="settings-gear-btn" id="folderRuleHelpBtn" onclick="toggleFolderRuleHelp(event)" style="border-color: var(--accent); color: var(--accent); flex-shrink: 0; background: rgba(14, 165, 233, 0.06); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s;" title="ファイル命名ルールを表示">
+                    <button class="settings-gear-btn" id="folderRuleHelpBtn" onclick="toggleFolderRuleHelp(event)" style="border-color: var(--accent); color: var(--accent); flex-shrink: 0; background: rgba(14, 165, 233, 0.06); width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; cursor: pointer; transition: all 0.2s; border-width: 1.5px;" title="ファイル命名ルールを表示">
                         💡
                     </button>
                 </div>
 
                 <!-- 🌐 GitHubオンラインロード用セレクトボックス -->
                 <div class="select-wrapper" style="width: 100%;">
-                    <select id="githubFolderSelect" onchange="handleGithubFolderSelect(this.value)" style="height: 38px; padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.8rem; border-color: var(--accent); background: rgba(255, 255, 255, 0.75);">
+                    <select id="githubFolderSelect" onchange="handleGithubFolderSelect(this.value)" style="height: 38px; padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.8rem; border-color: var(--accent); background: rgba(255, 255, 255, 0.75); border-radius: 12px; border-width: 1.5px; color: var(--accent); font-weight: 600;">
                         <option value="">🌐 GitHubからロード... (読込中 ⏳)</option>
                     </select>
                 </div>
@@ -1588,7 +1588,7 @@
             </div>
 
             <!-- Flowボタン -->
-            <a href="https://labs.google/fx/ja/tools/flow" target="_blank" class="flow-link-btn" id="flowLink" style="width: 280px; justify-content: center; height: 38px; box-sizing: border-box;">
+            <a href="https://labs.google/fx/ja/tools/flow" target="_blank" class="flow-link-btn" id="flowLink" style="width: 280px; justify-content: center; height: 38px; box-sizing: border-box; border-radius: 12px; font-size: 0.8rem; border-width: 1.5px;">
                 <svg viewBox="0 0 24 24">
                     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9v-2h2v2zm0-4H9V7h2v5zm4 4h-2v-2h2v2zm0-4h-2V7h2v5z"/>
                 </svg>
@@ -2350,7 +2350,7 @@
 
                     <!-- ⭐️ 円形サークル背景でボタンとしての存在感を高めた極上の開閉インジケーター -->
                     <div class="chevron-bg" style="width: 28px; height: 28px; border-radius: 50%; background: rgba(99, 102, 241, 0.08); display: flex; align-items: center; justify-content: center; transition: background-color 0.2s;">
-                        <svg class="chevron-icon" id="previewChevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" style="transition: transform 0.25s; pointer-events: none; transform: rotate(180deg); color: var(--primary);">
+                        <svg class="chevron-icon" id="previewChevron" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" style="transition: transform 0.25s; pointer-events: none; transform: rotate(0deg); color: var(--primary);">
                             <polyline points="6 9 12 15 18 9"/>
                         </svg>
                     </div>
@@ -2358,7 +2358,7 @@
             </div>
             
             <!-- 格納（折りたたみ）されるコンテンツ領域 -->
-            <div id="previewContent" style="display: block; padding: 0 1.5rem 1.5rem 1.5rem; border-top: 1px solid var(--border-color);">
+            <div id="previewContent" style="display: none; padding: 0 1.5rem 1.5rem 1.5rem; border-top: 1px solid var(--border-color);">
                 <div class="prompt-box" id="promptResult" style="margin-top: 1.2rem;"></div>
 
                 <div class="translation-preview-area">
@@ -2918,7 +2918,7 @@
                 if (presetsWrapper) presetsWrapper.style.display = 'block';
                 if (previewArea) {
                     previewArea.style.display = 'block';
-                    togglePreviewArea(true); // 👈 プロンプト生成系タブへ切り替え時は自動展開
+                    // ユーザーの手動開閉を維持するため、タブ切り替え時の自動展開（true）を無効化
                 }
                 
                 updateDescriptions();
