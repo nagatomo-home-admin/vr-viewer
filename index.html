@@ -1548,19 +1548,16 @@
         </div>
         
         <div class="header-actions" style="width: 326px;">
-            <!-- 📁 お施主様フォルダロード（ローカル・GitHub統合）と説明ポップオーバーのグループ -->
+            <!-- 📁 お施主様フォルダロード（モーダル起動）と説明ポップオーバーのグループ -->
             <div style="position: relative; display: flex; flex-direction: column; gap: 0.5rem; width: 100%;">
                 <div style="display: flex; align-items: center; gap: 0.5rem; width: 100%;">
-                    <!-- 📂 ローカル・GitHub統合セレクトボックス -->
-                    <div class="select-wrapper" style="flex: 1;">
-                        <select id="folderLoadSelect" onchange="handleFolderLoadSelect(this.value)" style="height: 38px; padding-top: 0.5rem; padding-bottom: 0.5rem; font-size: 0.8rem; border-color: var(--accent); background: rgba(255, 255, 255, 0.75); border-radius: 12px; border-width: 1.5px; color: var(--accent); font-weight: 600;">
-                            <option value="">📂 お施主様フォルダをロード...</option>
-                            <option value="local">💻 ローカルPCからロード... (フォルダ選択)</option>
-                            <optgroup label="🌐 GitHubからロード... (読込中 ⏳)" id="githubFoldersGroup">
-                                <!-- JavaScriptで動的に追加されます -->
-                            </optgroup>
-                        </select>
-                    </div>
+                    <!-- 📂 モーダル起動ボタン -->
+                    <button class="flow-link-btn" onclick="openFolderLoadModal()" style="flex: 1; background: rgba(14, 165, 233, 0.06); border-color: var(--accent); color: var(--accent); justify-content: center; height: 38px; border-radius: 12px; font-size: 0.8rem; border-width: 1.5px;">
+                        <svg viewBox="0 0 24 24" style="width: 14px; height: 14px; fill: currentColor; margin-right: 3px;">
+                            <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/>
+                        </svg>
+                        📂 お施主様フォルダをロード...
+                    </button>
                     <input type="file" id="folderInput" webkitdirectory directory multiple style="display: none;" onchange="handleFolderSelect(event)">
                     
                     <!-- 💡 説明用ヘルプボタン -->
@@ -5809,24 +5806,105 @@
             window.panoWebUrls = { before: "", after: "" };
         }
 
-        // ドロップダウンからロード先（ローカル or GitHub）が選ばれた時のハンドラ
-        function handleFolderLoadSelect(value) {
-            if (value === "local") {
-                triggerFolderSelect();
-                document.getElementById('folderLoadSelect').value = ""; // 選択をプレースホルダーに戻す
-            } else if (value) {
-                handleGithubFolderSelect(value);
+        // 📂 お施主様フォルダロード用モーダルの開閉制御
+        function openFolderLoadModal() {
+            const modal = document.getElementById('folderLoadModal');
+            if (modal) {
+                modal.classList.add('active');
+                // モーダルを開いたタイミングでお施主様フォルダを動的取得
+                fetchGithubCustomerFolders();
             }
         }
 
-        // GitHub APIから顧客フォルダ一覧を動的取得
+        function closeFolderLoadModal() {
+            const modal = document.getElementById('folderLoadModal');
+            if (modal) modal.classList.remove('active');
+        }
+
+        // ドラッグ＆ドロップイベントの設定と再帰スキャン
+        document.addEventListener('DOMContentLoaded', () => {
+            const dropzone = document.getElementById('modalDropzone');
+            if (!dropzone) return;
+
+            // ドラッグオーバー・リーブの視覚効果
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.add('dragover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropzone.classList.remove('dragover');
+                }, false);
+            });
+
+            // ドロップ時の処理
+            dropzone.addEventListener('drop', async (e) => {
+                const items = e.dataTransfer.items;
+                if (!items) return;
+
+                const filesList = [];
+                showToast("📂 フォルダを解析中... ⏳");
+
+                // 再帰的にファイルをスキャンするヘルパー
+                async function scanFiles(item, list) {
+                    if (item.isFile) {
+                        const file = await new Promise((resolve) => item.file(resolve));
+                        // 画像ファイルのみをスキャン対象とする
+                        const name = file.name.toLowerCase();
+                        if (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp') || name.endsWith('.gif')) {
+                            list.push(file);
+                        }
+                    } else if (item.isDirectory) {
+                        const dirReader = item.createReader();
+                        const entries = await new Promise((resolve) => {
+                            dirReader.readEntries(resolve);
+                        });
+                        for (const entry of entries) {
+                            await scanFiles(entry, list);
+                        }
+                    }
+                }
+
+                try {
+                    for (let i = 0; i < items.length; i++) {
+                        const item = items[i].webkitGetAsEntry();
+                        if (item) {
+                            await scanFiles(item, filesList);
+                        }
+                    }
+
+                    if (filesList.length > 0) {
+                        closeFolderLoadModal();
+                        classifyAndLoadFolderFiles(filesList);
+                    } else {
+                        showToast("❌ 有効な画像ファイルが見つかりませんでした", "#ef4444");
+                    }
+                } catch (err) {
+                    console.error("[D&D] フォルダスキャンエラー:", err);
+                    showToast("❌ フォルダ解析中にエラーが発生しました", "#ef4444");
+                }
+            }, false);
+        });
+
+        // GitHub APIから顧客フォルダ一覧を動的取得 (モーダル内のリストへ表示)
         async function fetchGithubCustomerFolders() {
-            const selectEl = document.getElementById('folderLoadSelect');
-            const groupEl = document.getElementById('githubFoldersGroup');
-            if (!selectEl || !groupEl) return;
+            const container = document.getElementById('githubFolderListContainer');
+            if (!container) return;
+
+            // ローディング表示
+            container.innerHTML = `
+                <div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 1.5rem 0;" id="githubListLoadingState">
+                    フォルダを読込中... ⏳
+                </div>
+            `;
 
             try {
-                // パブリックリポジトリのためトークンなしで contents API を利用可能
                 const response = await fetch('https://api.github.com/repos/nagatomo-home-admin/vr-viewer/contents/customers');
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -5836,16 +5914,14 @@
                 // フォルダのみを抽出
                 const folders = data.filter(item => item.type === 'dir').map(item => item.name);
                 
-                // 選択肢のクリア
-                groupEl.innerHTML = '';
-                groupEl.label = "🌐 GitHub（オンライン）からロード";
+                container.innerHTML = ''; // クリア
                 
                 if (folders.length === 0) {
-                    const opt = document.createElement('option');
-                    opt.value = "";
-                    opt.textContent = "顧客フォルダが見つかりません";
-                    opt.disabled = true;
-                    groupEl.appendChild(opt);
+                    container.innerHTML = `
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 1.5rem 0;">
+                            お施主様フォルダが見つかりません
+                        </div>
+                    `;
                     return;
                 }
 
@@ -5853,36 +5929,42 @@
                 folders.sort((a, b) => b.localeCompare(a));
 
                 folders.forEach(folder => {
-                    const opt = document.createElement('option');
-                    opt.value = folder;
-                    opt.textContent = folder;
-                    groupEl.appendChild(opt);
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'github-folder-item';
+                    itemEl.innerHTML = `
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                        </svg>
+                        <span>${folder}</span>
+                    `;
+                    itemEl.onclick = () => handleGithubFolderSelect(folder);
+                    container.appendChild(itemEl);
                 });
 
                 console.log(`[GitHub API] 顧客フォルダを ${folders.length} 件ロードしました。`);
 
             } catch (err) {
                 console.error("[GitHub API] フォルダ一覧の取得に失敗しました:", err);
-                groupEl.innerHTML = '<option value="" disabled>取得失敗 (再読込はリロードしてください)</option>';
-                groupEl.label = "🌐 GitHub（オンライン）からロード (失敗)";
+                container.innerHTML = `
+                    <div style="font-size: 0.72rem; color: #ef4444; text-align: center; padding: 1.5rem 0;">
+                        取得失敗。再読み込みするにはリロードしてください。
+                    </div>
+                `;
                 showToast("❌ GitHubから顧客フォルダ一覧を取得できませんでした", "#ef4444");
             }
         }
 
-        // ドロップダウンでお施主様フォルダが選択された時の処理
+        // お施主様フォルダが選択された時の処理 (オンラインダウンロード)
         async function handleGithubFolderSelect(folderName) {
             if (!folderName) return;
 
             console.log(`[GitHub API] 顧客フォルダ選択: ${folderName}`);
             
-            // UI上のローディング表示を表示
-            const selectEl = document.getElementById('folderLoadSelect');
-            if (selectEl) selectEl.disabled = true;
-            
             // 顧客名の進捗名をセット
             currentFolderProgressName = folderName;
 
             showToast(`🌐 オンラインから画像を取得中... ⏳`);
+            closeFolderLoadModal(); // ロード開始のためモーダルを閉じる
 
             try {
                 // フォルダ内のファイル一覧を取得
@@ -5900,10 +5982,6 @@
 
                 if (imageItems.length === 0) {
                     showToast("❌ フォルダ内に対象の画像ファイルが見つかりません", "#ef4444");
-                    if (selectEl) {
-                        selectEl.disabled = false;
-                        selectEl.value = "";
-                    }
                     return;
                 }
 
@@ -5927,10 +6005,6 @@
 
                 if (filesList.length === 0) {
                     showToast("❌ 画像のダウンロードに失敗しました", "#ef4444");
-                    if (selectEl) {
-                        selectEl.disabled = false;
-                        selectEl.value = "";
-                    }
                     return;
                 }
 
@@ -5940,11 +6014,6 @@
             } catch (err) {
                 console.error("[GitHub API] 画像一括ロードエラー:", err);
                 showToast("❌ GitHubからの画像ロード中にエラーが発生しました", "#ef4444");
-            } finally {
-                if (selectEl) {
-                    selectEl.disabled = false;
-                    selectEl.value = ""; // 選択をクリアして再選択可能にする
-                }
             }
         }
 
@@ -6000,6 +6069,47 @@
                 <button onclick="closeImageSelectModal()" class="sync-toggle-btn" style="flex: 0.4; padding: 0.7rem; border-radius: 12px; font-weight: 700; background: rgba(148, 163, 184, 0.08); border: 1.5px solid var(--border-color); color: var(--text-muted); cursor: pointer; justify-content: center; font-size: 0.8rem;">
                     キャンセル
                 </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📂 【新設】お施主様フォルダロード用左右分割モーダル (極上のすりガラス仕様) -->
+    <div id="folderLoadModal" class="modal-overlay" onclick="if(event.target === this) closeFolderLoadModal()">
+        <div class="load-modal-container">
+            <button onclick="closeFolderLoadModal()" class="modal-close-btn">×</button>
+            
+            <div class="modal-title">
+                <span style="font-size: 1.4rem;">📂</span> お施主様フォルダをロード
+            </div>
+            
+            <div class="modal-body-split">
+                <!-- 左側：ローカルロードエリア -->
+                <div class="modal-col-left">
+                    <div class="modal-dropzone" id="modalDropzone" onclick="document.getElementById('folderInput').click()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="17 8 12 3 7 8"></polyline>
+                            <line x1="12" y1="3" x2="12" y2="15"></line>
+                        </svg>
+                        <div class="modal-dropzone-title">💻 ローカルPCからロード</div>
+                        <div class="modal-dropzone-desc">
+                            ここにフォルダをドラッグ＆ドロップ<br>
+                            またはクリックしてフォルダを選択
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 右側：GitHubロードエリア -->
+                <div class="modal-col-right">
+                    <div class="modal-right-title">
+                        <span>🌐</span> GitHubからロード (オンライン)
+                    </div>
+                    <div class="github-folder-list-container" id="githubFolderListContainer">
+                        <div style="font-size: 0.72rem; color: var(--text-muted); text-align: center; padding: 1.5rem 0;" id="githubListLoadingState">
+                            フォルダを読込中... ⏳
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
