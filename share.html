@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -654,6 +654,7 @@
         window.viewer = null;
         window.panoGyroEnabled = false;
 
+        // URLパラメータの解析（従来の a/b 指定と、f のみ指定の両方に対応）
         function parseUrlParams() {
             const params = new URLSearchParams(window.location.search);
             let beforeParam = params.get('a') || params.get('before');
@@ -686,6 +687,9 @@
             panoImages.before = cleanToPanoPath(beforeParam);
             panoImages.after = cleanToPanoPath(afterParam);
             
+            // グローバルに保持（後から自動解決処理で使うため）
+            window._cleanFolder = cleanFolder;
+            
             const ownerName = params.get('name');
             if (ownerName) {
                 const nameStr = decodeURIComponent(ownerName);
@@ -701,6 +705,61 @@
                 const btnL = document.getElementById('adminImportBtnLandscape');
                 if (btn) btn.style.display = 'inline-flex';
                 if (btnL) btnL.style.display = 'inline-flex';
+            }
+        }
+
+        // 🌐 フォルダ名だけでGitHub APIからパノラマ画像を自動解決する処理
+        // 判定順序: pano_after/pano_b → B面を先に判定し、pano_a の誤認識を防止
+        async function autoResolveFromFolder(folderName) {
+            showLoader(true, 'お施主様フォルダから画像を検索中...');
+            try {
+                const response = await fetch(`https://api.github.com/repos/nagatomo-home-admin/vr-viewer/contents/customers/${folderName}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const contents = await response.json();
+                
+                // 画像ファイルのみを抽出
+                const imageFiles = contents.filter(item => {
+                    const name = item.name.toLowerCase();
+                    return item.type === 'file' && (name.endsWith('.jpg') || name.endsWith('.jpeg') || name.endsWith('.png') || name.endsWith('.webp'));
+                });
+
+                let panoA = null; // A面（pano_before, pano_a）
+                let panoB = null; // B面（pano_after, pano_b）
+
+                for (const file of imageFiles) {
+                    const name = file.name.toLowerCase();
+                    
+                    // ⚠️ 判定順序が重要！pano_after を先に判定して pano_a との誤認識を防止
+                    if (!panoB && (name.includes('pano_after') || name.includes('pano_b'))) {
+                        panoB = file.name;
+                    } else if (!panoA && (name.includes('pano_before') || name.includes('pano_a'))) {
+                        panoA = file.name;
+                    } else if (!panoA && name.includes('pano') && name.includes('before')) {
+                        panoA = file.name;
+                    } else if (!panoB && name.includes('pano') && name.includes('after')) {
+                        panoB = file.name;
+                    }
+                }
+
+                // 検出した画像をパスに変換して設定
+                if (panoA) {
+                    panoImages.before = `customers/${folderName}/${panoA}`;
+                }
+                if (panoB) {
+                    panoImages.after = `customers/${folderName}/${panoB}`;
+                }
+
+                console.log(`[自動解決] A面: ${panoA || '未検出'}, B面: ${panoB || '未検出'}`);
+
+                return !!(panoA || panoB);
+
+            } catch (err) {
+                console.error('[自動解決] GitHub APIからの画像取得に失敗しました:', err);
+                showLoader(false);
+                showToast('❌ フォルダからの画像取得に失敗しました', true);
+                return false;
             }
         }
 
@@ -857,10 +916,20 @@
             window.open(officialUrl, '_blank');
         }
 
-        // 🚀 初期ロード (パノラマ画像は厳格に images/ フォルダから固定ロード！)
-        window.addEventListener('DOMContentLoaded', () => {
+        // 🚀 初期ロード（後方互換対応：a/b パラメータがあれば従来通り、なければフォルダから自動解決）
+        window.addEventListener('DOMContentLoaded', async () => {
             parseUrlParams();
             
+            // a/b パラメータが未指定 かつ フォルダ名が指定されている場合、GitHub APIで自動解決
+            if (!panoImages.before && !panoImages.after && window._cleanFolder) {
+                const resolved = await autoResolveFromFolder(window._cleanFolder);
+                if (!resolved) {
+                    showLoader(false);
+                    showToast("⚠️ フォルダ内にパノラマ画像が見つかりませんでした。", true);
+                    return;
+                }
+            }
+
             const startUrl = panoImages.before || panoImages.after;
             if (startUrl) {
                 if (!panoImages.before && panoImages.after) {
@@ -880,3 +949,4 @@
     </script>
 </body>
 </html>
+
