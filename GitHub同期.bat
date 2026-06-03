@@ -6,6 +6,25 @@ echo.
 
 cd /d "%~dp0"
 
+:: [Safety Lock 1] Verify parent customers folder exists
+if not exist "..\customers" (
+    echo [ERROR] The parent "customers" folder does not exist!
+    echo Sync has been aborted to protect your online data.
+    echo.
+    pause
+    exit /b
+)
+
+:: [Safety Lock 2] Verify parent customers folder is not empty
+dir /b /a "..\customers" 2>nul | findstr "^" >nul
+if %errorlevel% neq 0 (
+    echo [ERROR] The parent "customers" folder is empty!
+    echo Sync has been aborted to protect your online data from deletion.
+    echo.
+    pause
+    exit /b
+)
+
 echo [1/4] Copying latest HTML files...
 copy /y "..\share.html" "share.html" >nul 2>&1
 copy /y "..\share_slide.html" "share_slide.html" >nul 2>&1
