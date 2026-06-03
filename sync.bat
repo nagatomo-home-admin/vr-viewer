@@ -45,7 +45,7 @@ git add .
 git commit -m "Auto sync: %date% %time%"
 git push
 
-if %errorlevel% eq 0 (
+if %errorlevel% EQU 0 (
     echo.
     echo ==========================================
     echo   SUCCESS: Upload to GitHub completed!
