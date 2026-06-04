@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
@@ -825,9 +825,8 @@
                 });
                 window.viewer.on('load', () => {
                     showLoader(false);
-                    if (window.panoGyroEnabled && typeof window.viewer.startOrientation === 'function') {
-                        try { window.viewer.startOrientation(); } catch (e) { console.error(e); }
-                    }
+                    // 🚀 ロード完了時に自動でジャイロ有効化を試みる
+                    autoEnableGyroOnLoad();
                 });
             } catch (e) {
                 showLoader(false);
@@ -861,10 +860,7 @@
             const btnL = document.getElementById('gyroBtnLandscape');
             if (!window.viewer) return;
             if (window.panoGyroEnabled) {
-                window.panoGyroEnabled = false;
-                if(btn) btn.classList.remove('active');
-                if(btnL) btnL.classList.remove('active');
-                try { window.viewer.stopOrientation(); } catch (e) { console.error(e); }
+                disableGyro(btn, btnL);
                 showToast("ジャイロ連動をOFFにしました");
             } else {
                 if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
@@ -877,11 +873,50 @@
             }
         }
 
+        // 🚀 初期ロード時に自動でジャイロを有効化する（非インタラクティブ）
+        function autoEnableGyroOnLoad() {
+            const btn = document.getElementById('gyroBtn');
+            const btnL = document.getElementById('gyroBtnLandscape');
+            
+            // すでに許可を得ているか、またはrequestPermission不要な環境用
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(state => {
+                        if (state === 'granted') {
+                            enableGyro(btn, btnL);
+                        } else {
+                            disableGyro(btn, btnL);
+                        }
+                    })
+                    .catch(err => {
+                        // iOS等で初回起動時、クリックイベントを契機としないためブロックされた場合は、
+                        // エラーを吐かずに静かにオフのままとします。
+                        disableGyro(btn, btnL);
+                    });
+            } else {
+                // Androidや一部PCブラウザなど
+                if (window.DeviceOrientationEvent) {
+                    enableGyro(btn, btnL);
+                } else {
+                    disableGyro(btn, btnL);
+                }
+            }
+        }
+
         function enableGyro(btn, btnL) {
             window.panoGyroEnabled = true;
             if(btn) btn.classList.add('active');
             if(btnL) btnL.classList.add('active');
             try { window.viewer.startOrientation(); showToast("📱 ジャイロ連動開始"); } catch (e) { window.panoGyroEnabled = false; }
+        }
+
+        function disableGyro(btn, btnL) {
+            window.panoGyroEnabled = false;
+            if(btn) btn.classList.remove('active');
+            if(btnL) btnL.classList.remove('active');
+            if (window.viewer) {
+                try { window.viewer.stopOrientation(); } catch (e) { console.error(e); }
+            }
         }
 
         function resetPanoView() {
