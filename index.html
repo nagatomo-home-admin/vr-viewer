@@ -3850,68 +3850,73 @@
 
         // 共通のファイル分類およびロード処理
         function classifyAndLoadFolderFiles(files) {
-            // プールの初期化
-            folderFilePool = {
-                slide_before: [],
-                slide_after: [],
-                pano_before: [],
-                pano_after: []
-            };
-            folderSelectedFiles = {
-                slide_before: null,
-                slide_after: null,
-                pano_before: null,
-                pano_after: null
-            };
+            try {
+                // プールの初期化
+                folderFilePool = {
+                    slide_before: [],
+                    slide_after: [],
+                    pano_before: [],
+                    pano_after: []
+                };
+                folderSelectedFiles = {
+                    slide_before: null,
+                    slide_after: null,
+                    pano_before: null,
+                    pano_after: null
+                };
 
-            // ファイル名から該当する画像を自動探索・プールに分類蓄積
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                const name = file.name.toLowerCase();
+                // ファイル名から該当する画像を自動探索・プールに分類蓄積
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    const name = file.name.toLowerCase();
 
-                // 画像ファイルのみ対象 (MIMEタイプ、または拡張子で判定することでスマホのブラウザ仕様を回避)
-                const isImage = (file.type && file.type.startsWith('image/')) || 
-                                name.endsWith('.jpg') || 
-                                name.endsWith('.jpeg') || 
-                                name.endsWith('.png') || 
-                                name.endsWith('.webp') || 
-                                name.endsWith('.gif');
-                if (!isImage) continue;
+                    // 画像ファイルのみ対象 (MIMEタイプ、または拡張子で判定することでスマホのブラウザ仕様を回避)
+                    const isImage = (file.type && file.type.startsWith('image/')) || 
+                                    name.endsWith('.jpg') || 
+                                    name.endsWith('.jpeg') || 
+                                    name.endsWith('.png') || 
+                                    name.endsWith('.webp') || 
+                                    name.endsWith('.gif');
+                    if (!isImage) continue;
 
-                // 命名ルールに基づく判定（厳格判定：部分一致の競合を回避）
-                if (name.includes('slide_before') || (name.includes('before') && !name.includes('pano'))) {
-                    folderFilePool.slide_before.push(file);
-                } else if (name.includes('slide_after') || (name.includes('after') && !name.includes('pano'))) {
-                    folderFilePool.slide_after.push(file);
-                } else if (name.includes('pano_before') || (name.includes('pano') && name.includes('before'))) {
-                    folderFilePool.pano_before.push(file);
-                } else if (name.includes('pano_after') || (name.includes('pano') && name.includes('after'))) {
-                    folderFilePool.pano_after.push(file);
-                } else if (name.includes('pano_a')) {
-                    folderFilePool.pano_before.push(file);
-                } else if (name.includes('pano_b')) {
-                    folderFilePool.pano_after.push(file);
+                    // 命名ルールに基づく判定（厳格判定：部分一致の競合を回避）
+                    if (name.includes('slide_before') || (name.includes('before') && !name.includes('pano'))) {
+                        folderFilePool.slide_before.push(file);
+                    } else if (name.includes('slide_after') || (name.includes('after') && !name.includes('pano'))) {
+                        folderFilePool.slide_after.push(file);
+                    } else if (name.includes('pano_before') || (name.includes('pano') && name.includes('before'))) {
+                        folderFilePool.pano_before.push(file);
+                    } else if (name.includes('pano_after') || (name.includes('pano') && name.includes('after'))) {
+                        folderFilePool.pano_after.push(file);
+                    } else if (name.includes('pano_a')) {
+                        folderFilePool.pano_before.push(file);
+                    } else if (name.includes('pano_b')) {
+                        folderFilePool.pano_after.push(file);
+                    }
                 }
-            }
 
-            // 各カテゴリで複数見つかったか判定
-            const hasMultiple = 
-                folderFilePool.slide_before.length > 1 || 
-                folderFilePool.slide_after.length > 1 || 
-                folderFilePool.pano_before.length > 1 || 
-                folderFilePool.pano_after.length > 1;
+                // 各カテゴリで複数見つかったか判定
+                const hasMultiple = 
+                    folderFilePool.slide_before.length > 1 || 
+                    folderFilePool.slide_after.length > 1 || 
+                    folderFilePool.pano_before.length > 1 || 
+                    folderFilePool.pano_after.length > 1;
 
-            if (hasMultiple) {
-                // 重複がある場合は画像選択モーダルを開く
-                openImageSelectModal();
-            } else {
-                // 重複がない場合は、見つかった単一のファイルを自動採用して直ちにロード
-                folderSelectedFiles.slide_before = folderFilePool.slide_before[0] || null;
-                folderSelectedFiles.slide_after = folderFilePool.slide_after[0] || null;
-                folderSelectedFiles.pano_before = folderFilePool.pano_before[0] || null;
-                folderSelectedFiles.pano_after = folderFilePool.pano_after[0] || null;
-                
-                executeFinalLoad();
+                if (hasMultiple) {
+                    // 重複がある場合は画像選択モーダルを開く
+                    openImageSelectModal();
+                } else {
+                    // 重複がない場合は、見つかった単一のファイルを自動採用して直ちにロード
+                    folderSelectedFiles.slide_before = folderFilePool.slide_before[0] || null;
+                    folderSelectedFiles.slide_after = folderFilePool.slide_after[0] || null;
+                    folderSelectedFiles.pano_before = folderFilePool.pano_before[0] || null;
+                    folderSelectedFiles.pano_after = folderFilePool.pano_after[0] || null;
+                    
+                    executeFinalLoad();
+                }
+            } catch (err) {
+                console.error("[分類処理エラー]", err);
+                showToast(`❌ 分類エラー: ${err.message}`, "#ef4444");
             }
         }
 
@@ -6271,12 +6276,11 @@
 
                 showToast(`📥 画像データをダウンロード中 (${imageItems.length}件)... ⏳`);
 
-                // 各画像をダウンロードし、Fileオブジェクトに変換
-                const filesList = [];
-                for (const item of imageItems) {
+                // 各画像を並列（同時）にダウンロードし、Fileオブジェクトに変換（劇的高速化）
+                const downloadPromises = imageItems.map(async (item) => {
                     try {
                         const fileRes = await fetch(item.download_url);
-                        if (!fileRes.ok) continue;
+                        if (!fileRes.ok) return null;
                         const blob = await fileRes.blob();
                         
                         // 📱 スマホ環境対策: CORSやブラウザ制限によりBlobのMIMEタイプが空や汎用バイナリになるのを防ぐ
@@ -6289,13 +6293,16 @@
                             else if (ext === 'gif') mimeType = 'image/gif';
                         }
                         
-                        // ダウンロードしたBlobからFileオブジェクトを作成（既存の分類処理へ渡すため）
-                        const file = new File([blob], item.name, { type: mimeType });
-                        filesList.push(file);
+                        // ダウンロードしたBlobからFileオブジェクトを作成
+                        return new File([blob], item.name, { type: mimeType });
                     } catch (fetchErr) {
                         console.error(`[GitHub API] ファイルのフェッチ失敗: ${item.name}`, fetchErr);
+                        return null;
                     }
-                }
+                });
+
+                const downloadedFiles = await Promise.all(downloadPromises);
+                const filesList = downloadedFiles.filter(file => file !== null);
 
                 if (filesList.length === 0) {
                     showToast("❌ 画像のダウンロードに失敗しました", "#ef4444");
