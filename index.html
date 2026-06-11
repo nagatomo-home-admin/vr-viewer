@@ -3870,7 +3870,7 @@
                 const name = file.name.toLowerCase();
 
                 // 画像ファイルのみ対象 (MIMEタイプ、または拡張子で判定することでスマホのブラウザ仕様を回避)
-                const isImage = file.type.startsWith('image/') || 
+                const isImage = (file.type && file.type.startsWith('image/')) || 
                                 name.endsWith('.jpg') || 
                                 name.endsWith('.jpeg') || 
                                 name.endsWith('.png') || 
@@ -6280,7 +6280,7 @@
                         const blob = await fileRes.blob();
                         
                         // 📱 スマホ環境対策: CORSやブラウザ制限によりBlobのMIMEタイプが空や汎用バイナリになるのを防ぐ
-                        let mimeType = blob.type;
+                        let mimeType = blob.type || "";
                         if (!mimeType || mimeType === 'application/octet-stream') {
                             const ext = item.name.toLowerCase().split('.').pop();
                             if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
@@ -6307,7 +6307,7 @@
 
             } catch (err) {
                 console.error("[GitHub API] 画像一括ロードエラー:", err);
-                showToast("❌ GitHubからの画像ロード中にエラーが発生しました", "#ef4444");
+                showToast(`❌ エラーが発生しました: ${err.message}`, "#ef4444");
             }
         }
 
