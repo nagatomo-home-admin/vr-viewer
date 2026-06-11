@@ -3869,8 +3869,14 @@
                 const file = files[i];
                 const name = file.name.toLowerCase();
 
-                // 画像ファイルのみ対象
-                if (!file.type.startsWith('image/')) continue;
+                // 画像ファイルのみ対象 (MIMEタイプ、または拡張子で判定することでスマホのブラウザ仕様を回避)
+                const isImage = file.type.startsWith('image/') || 
+                                name.endsWith('.jpg') || 
+                                name.endsWith('.jpeg') || 
+                                name.endsWith('.png') || 
+                                name.endsWith('.webp') || 
+                                name.endsWith('.gif');
+                if (!isImage) continue;
 
                 // 命名ルールに基づく判定（厳格判定：部分一致の競合を回避）
                 if (name.includes('slide_before') || (name.includes('before') && !name.includes('pano'))) {
@@ -6273,8 +6279,18 @@
                         if (!fileRes.ok) continue;
                         const blob = await fileRes.blob();
                         
+                        // 📱 スマホ環境対策: CORSやブラウザ制限によりBlobのMIMEタイプが空や汎用バイナリになるのを防ぐ
+                        let mimeType = blob.type;
+                        if (!mimeType || mimeType === 'application/octet-stream') {
+                            const ext = item.name.toLowerCase().split('.').pop();
+                            if (ext === 'jpg' || ext === 'jpeg') mimeType = 'image/jpeg';
+                            else if (ext === 'png') mimeType = 'image/png';
+                            else if (ext === 'webp') mimeType = 'image/webp';
+                            else if (ext === 'gif') mimeType = 'image/gif';
+                        }
+                        
                         // ダウンロードしたBlobからFileオブジェクトを作成（既存の分類処理へ渡すため）
-                        const file = new File([blob], item.name, { type: blob.type });
+                        const file = new File([blob], item.name, { type: mimeType });
                         filesList.push(file);
                     } catch (fetchErr) {
                         console.error(`[GitHub API] ファイルのフェッチ失敗: ${item.name}`, fetchErr);
