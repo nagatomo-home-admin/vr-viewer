@@ -706,6 +706,14 @@
                 if (btn) btn.style.display = 'inline-flex';
                 if (btnL) btnL.style.display = 'inline-flex';
             }
+
+            // 🌐 embed=true がある場合は、ヘッダー、LINE相談ボタン、公式サイトボタンを非表示にする！
+            const isEmbed = params.get('embed') === 'true';
+            if (isEmbed) {
+                document.querySelectorAll('.header').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('.line-btn').forEach(el => el.style.display = 'none');
+                document.querySelectorAll('button[onclick="openOfficialWebsite()"]').forEach(el => el.style.display = 'none');
+            }
         }
 
         // 🌐 フォルダ名だけでGitHub APIからパノラマ画像を自動解決する処理
