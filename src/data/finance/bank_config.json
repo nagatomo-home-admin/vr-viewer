@@ -1,0 +1,10 @@
+{
+  "miya-bank": { "rate": 0.975, "evalRate": 3.250 },
+  "miya-bank-fix": { "rate": 2.850, "evalRate": 3.250 },
+  "taiyo-bank": { "rate": 1.075, "evalRate": 3.500 },
+  "kago-bank": { "rate": 1.350, "evalRate": 3.000 },
+  "kago-bank-fix": { "rate": 2.700, "evalRate": 3.000 },
+  "ja-bank": { "rate": 1.395, "evalRate": 3.000 },
+  "ja-bank-fix": { "rate": 2.300, "evalRate": 3.000 },
+  "flat35": { "rate": 1.900, "evalRate": 1.900 }
+}
