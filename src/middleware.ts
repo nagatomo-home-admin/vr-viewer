@@ -50,8 +50,9 @@ export const config = {
      * - _next/static (静的JS/CSS等)
      * - _next/image (画像最適化)
      * - favicon.ico (ファビコン)
+     * - manifest.json / sw.js (PWA設定ファイル)
      * - 静的ファイル拡張子 (png, jpg, svg等)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
