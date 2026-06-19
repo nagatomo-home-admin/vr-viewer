@@ -374,6 +374,7 @@ export default function FinanceCalculatorClient({
         padding: 0 !important;
         margin: 0 !important;
         zoom: 1.0 !important;
+        overflow: hidden !important; /* 2ページ目の発生をブラウザレベルで強制カット */
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
       }
@@ -396,10 +397,13 @@ export default function FinanceCalculatorClient({
       .no-print {
         display: none !important;
       }
-      /* 印刷時は外側の親コンテナのパディングをゼロにする */
+      /* 印刷時は外側の親コンテナのサイズを制限し、2ページ目の発生をカットする */
       div.w-full.flex-1 {
         padding: 0 !important;
         margin: 0 !important;
+        height: 290mm !important;
+        max-height: 290mm !important;
+        overflow: hidden !important;
       }
       .print-card {
         box-shadow: none !important;
@@ -408,8 +412,8 @@ export default function FinanceCalculatorClient({
         max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: 272mm !important; /* A3印刷可能縦幅(285mm)に余裕で収まる高さに厳密に固定 */
-        max-height: 272mm !important;
+        height: 275mm !important; /* 安全マージンを考慮した用紙全体の縦幅 */
+        max-height: 275mm !important;
         overflow: hidden !important; /* 2ページ目を絶対に発生させない */
       }
       /* 入力欄の背景や枠線を印刷向けにすっきりさせる */
@@ -443,7 +447,7 @@ export default function FinanceCalculatorClient({
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important; /* 等間隔に美しく分散配置 */
-        height: 236mm !important; /* ヘッダー(18mm)とフッター(10mm)を引いた高さ */
+        height: 238mm !important; /* 要素が詰まらないよう高さを確保 */
       }
     }
   `;
@@ -818,19 +822,19 @@ export default function FinanceCalculatorClient({
                右半分：資金計画書（銀行提出用レイアウト）
                ========================================== */}
           <div className="col-span-12 lg:col-span-8 p-6 flex flex-col justify-between" id="printArea">
-            <div className="space-y-5">
+            <div className="space-y-4">
               {/* 融資申込ヘッダー情報 */}
               <div className="flex justify-between items-start border-b-2 border-[#0A1D37] pb-3">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-white bg-[#0A1D37] px-2.5 py-0.5 rounded">
+                    <span className="text-xs font-bold text-white bg-[#0A1D37] px-2 py-0.5 rounded">
                       融資申込用
                     </span>
-                    <h2 className="text-sm md:text-base font-bold text-[#0A1D37] flex items-center gap-1">
+                    <h2 className="text-base font-bold text-[#0A1D37] flex items-center gap-1">
                       御申込予定者様名：
                       <input
                         type="text"
-                        className="border-b border-slate-400 focus:outline-none focus:border-[#0A1D37] font-bold px-2 py-0.5 text-xs md:text-sm w-36 md:w-44 bg-transparent text-[#0A1D37]"
+                        className="border-b border-slate-400 focus:outline-none focus:border-[#0A1D37] font-bold px-2 py-0.5 text-sm w-48 bg-transparent text-[#0A1D37]"
                         placeholder="（顧客名を入力）"
                         value={clientName}
                         onChange={e => setClientName(e.target.value)}
@@ -838,30 +842,30 @@ export default function FinanceCalculatorClient({
                       様
                     </h2>
                   </div>
-                  <p className="text-[9px] text-slate-400 leading-none">
+                  <p className="text-[10px] text-slate-400 leading-none">
                     ※本資金計画書は、対象物件の購入および当社ゾーン断熱改修工事の設計・資金内訳を証明するものです。
                   </p>
                 </div>
                 <div className="text-right flex items-start gap-4">
-                  <div className="text-[9px] text-slate-500 font-semibold leading-normal">
+                  <div className="text-[10px] text-slate-500 font-medium leading-normal">
                     <p>作成年月日：{todayStr}</p>
                     <p>ご提案会社：株式会社 長友ホーム</p>
-                    <p className="text-[8px] text-slate-400 font-normal">
+                    <p className="text-[9px] text-slate-400 font-normal">
                       住所：〒885-0012 宮崎県都城市上川東3-4-14
                     </p>
-                    <p className="text-[8px] text-slate-400 font-normal">
+                    <p className="text-[9px] text-slate-400 font-normal">
                       TEL：0986-45-0157 / FAX：0986-45-0158
                     </p>
                   </div>
                   {/* 捺印枠 */}
                   <div className="flex items-center gap-1.5 -mt-1.5">
-                    <div className="border border-slate-300 w-11 text-center text-[7px] text-slate-400 rounded">
+                    <div className="border border-slate-300 w-12 text-center text-[8px] text-slate-400 rounded">
                       <div className="bg-slate-50 py-0.5 border-b border-slate-200 font-bold">検印</div>
-                      <div className="h-7"></div>
+                      <div className="h-8"></div>
                     </div>
-                    <div className="border border-slate-300 w-11 text-center text-[7px] text-slate-400 rounded">
+                    <div className="border border-slate-300 w-12 text-center text-[8px] text-slate-400 rounded">
                       <div className="bg-slate-50 py-0.5 border-b border-slate-200 font-bold">担当</div>
-                      <div className="h-7"></div>
+                      <div className="h-8"></div>
                     </div>
                   </div>
                 </div>
@@ -869,70 +873,70 @@ export default function FinanceCalculatorClient({
 
               {/* 物件名表示 */}
               <div className="flex justify-between items-center bg-[#0A1D37]/5 px-4 py-2 rounded-lg border border-[#0A1D37]/10">
-                <span className="text-[10px] md:text-xs font-bold text-[#0A1D37]">■ 対象物件名/計画モデル:</span>
-                <strong className="text-xs md:text-sm font-bold text-[#0A1D37]">{propName}</strong>
+                <span className="text-xs font-bold text-[#0A1D37]">■ 対象物件名/計画モデル:</span>
+                <strong className="text-sm font-bold text-[#0A1D37]">{propName}</strong>
               </div>
 
               {/* 使途 & 調達 バランスシート対比 (縦の文字間・行間スペースを確保) */}
-              <div className="grid grid-cols-2 gap-5">
+              <div className="grid grid-cols-2 gap-6">
                 {/* 左：使途（必要資金） */}
                 <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/20">
-                  <h3 className="font-bold text-[#0A1D37] border-b border-[#0A1D37]/20 pb-1.5 mb-2.5 flex justify-between items-center text-[10px] md:text-xs">
+                  <h3 className="font-bold text-[#0A1D37] border-b-2 border-[#0A1D37]/30 pb-1.5 mb-2.5 flex justify-between items-center text-xs">
                     <span>【資金の使途（必要資金）】</span>
-                    <span className="text-[8px] md:text-[9px] text-slate-400">用途内訳</span>
+                    <span className="text-[10px] text-slate-400">用途内訳</span>
                   </h3>
-                  <div className="space-y-3 text-[10px] md:text-xs text-slate-700 leading-relaxed">
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                  <div className="space-y-2 text-xs text-slate-700">
+                    <div className="flex justify-between border-b border-slate-150 pb-1">
                       <span>① 物件本体購入価格:</span>
-                      <span className="font-extrabold text-slate-900">{priceMan.toFixed(1)} 万円</span>
+                      <span className="font-bold text-slate-900">{priceMan.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                    <div className="flex justify-between border-b border-slate-150 pb-1">
                       <span>② リノベーション工事費用:</span>
-                      <span className="font-extrabold text-slate-900">{renovationCost.toFixed(1)} 万円</span>
+                      <span className="font-bold text-slate-900">{renovationCost.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                    <div className="flex justify-between border-b border-slate-150 pb-1">
                       <span>③ 太陽光発電設備 (オプション):</span>
-                      <span className="font-extrabold text-slate-900">{results.solarCost.toFixed(1)} 万円</span>
+                      <span className="font-bold text-slate-900">{results.solarCost.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                    <div className="flex justify-between border-b border-slate-150 pb-1">
                       <span>④ 諸費用概算 (登記・諸税金等):</span>
-                      <span className="font-extrabold text-slate-900 bg-amber-50/50 px-1.5 rounded">
+                      <span className="font-bold text-slate-900 bg-amber-50/50 px-1 rounded">
                         {results.finalMiscCost.toFixed(1)} 万円
                       </span>
                     </div>
-                    <div className="flex justify-between border-t border-[#0A1D37]/30 pt-2 font-bold text-red-650 text-xs md:text-sm">
+                    <div className="flex justify-between border-t-2 border-[#0A1D37]/40 pt-2 font-bold text-red-650 text-sm">
                       <span>必要資金合計 (総事業費):</span>
-                      <span className="text-base font-extrabold">{results.totalProjectCost.toFixed(1)} 万円</span>
+                      <span>{results.totalProjectCost.toFixed(1)} 万円</span>
                     </div>
                   </div>
                 </div>
 
                 {/* 右：調達（調達計画） */}
                 <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/20">
-                  <h3 className="font-bold text-[#0A1D37] border-b border-[#0A1D37]/20 pb-1.5 mb-2.5 flex justify-between items-center text-[10px] md:text-xs">
+                  <h3 className="font-bold text-[#0A1D37] border-b-2 border-[#0A1D37]/30 pb-1.5 mb-2.5 flex justify-between items-center text-xs">
                     <span>【資金の調達（調達計画）】</span>
-                    <span className="text-[8px] md:text-[9px] text-slate-400">調達内訳</span>
+                    <span className="text-[10px] text-slate-400">調達内訳</span>
                   </h3>
-                  <div className="space-y-3 text-[10px] md:text-xs text-slate-700 leading-relaxed">
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5 font-bold text-[#0A1D37] bg-[#0A1D37]/5 p-0.5 rounded -mx-0.5">
+                  <div className="space-y-2 text-xs text-slate-700">
+                    <div className="flex justify-between border-b border-slate-150 pb-1 font-bold text-[#0A1D37] bg-[#0A1D37]/5 p-1 rounded -mx-1">
                       <span>① 住宅ローン借入希望額:</span>
-                      <span className="font-extrabold">{results.loanAmount.toFixed(1)} 万円</span>
+                      <span>{results.loanAmount.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5">
+                    <div className="flex justify-between border-b border-slate-150 pb-1">
                       <span>② 自己資金 (頭金投入分):</span>
-                      <span className="font-extrabold text-slate-900">{downPayment.toFixed(1)} 万円</span>
+                      <span className="font-bold text-slate-900">{downPayment.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5 text-[#A3B899] font-bold">
+                    <div className="flex justify-between border-b border-slate-150 pb-1 text-[#A3B899] font-bold">
                       <span>③ 省エネ補助金 (支払割当分):</span>
-                      <span className="font-extrabold">🎁 {results.finalSubsidy.toFixed(1)} 万円</span>
+                      <span>🎁 {results.finalSubsidy.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5 text-slate-700">
+                    <div className="flex justify-between border-b border-slate-150 pb-1 text-slate-700">
                       <span>④ その他調達資金:</span>
-                      <span className="font-extrabold text-slate-900">{otherFunding.toFixed(1)} 万円</span>
+                      <span className="font-bold text-slate-900">{otherFunding.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-t border-[#0A1D37]/30 pt-2 font-bold text-[#0A1D37] text-xs md:text-sm">
+                    <div className="flex justify-between border-t-2 border-[#0A1D37]/40 pt-2 font-bold text-[#0A1D37] text-sm">
                       <span>調達資金合計:</span>
-                      <span className="text-base font-extrabold">{results.totalProjectCost.toFixed(1)} 万円</span>
+                      <span>{results.totalProjectCost.toFixed(1)} 万円</span>
                     </div>
                   </div>
                 </div>
@@ -973,26 +977,26 @@ export default function FinanceCalculatorClient({
 
               {/* QRコード表示エリア */}
               {qrCodeUrl && (
-                <div className="flex items-center gap-4 bg-yellow-50/20 p-3.5 rounded-xl border border-yellow-100/50 text-[10px] md:text-xs">
+                <div className="flex items-center gap-4 bg-yellow-50/20 p-3 rounded-xl border border-yellow-100/40 text-xs">
                   <a
                     href={propUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="block flex-shrink-0 hover:scale-105 transition cursor-pointer"
                   >
-                    <div className="w-12 h-12 md:w-14 md:h-14 border border-slate-200 p-1 bg-white rounded-lg flex items-center justify-center">
+                    <div className="w-14 h-14 border border-slate-200 p-1 bg-white rounded-lg flex items-center justify-center">
                       <img src={qrCodeUrl} alt="物件詳細QR" className="w-full h-full object-contain" />
                     </div>
                   </a>
                   <div className="no-print">
-                    <h4 className="font-bold text-[#0A1D37] text-[10px] md:text-[11px]">
+                    <h4 className="font-bold text-[#0A1D37] text-[11px]">
                       📱 スマホでスキャンして元の物件販売ページを確認
                     </h4>
-                    <p className="text-[8px] md:text-[9px] text-slate-400 leading-normal mt-0.5">
+                    <p className="text-[9px] text-slate-400 leading-normal mt-0.5">
                       チラシとして印刷後、融資担当者やご家族がスマホでスキャンして元の物件概要（間取り、敷地、写真等）を確認できます。クリックでも遷移可能です。
                     </p>
                   </div>
-                  <div className="hidden print:block text-[8px] md:text-[9px] text-slate-400">
+                  <div className="hidden print:block text-[9px] text-slate-400">
                     <p>
                       ※本資金計画書の詳細な販売情報・土地建物登記スペックを確認する場合は、左記QRコードをスマホでスキャンしてください。
                     </p>
@@ -1004,36 +1008,36 @@ export default function FinanceCalculatorClient({
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-slate-100/70 p-3 rounded-xl border border-slate-200 text-center">
-                    <span className="text-[#0A1D37]/70 text-[9px] md:text-[10px] font-bold block">
+                    <span className="text-[#0A1D37]/70 text-[10px] font-bold block">
                       現在の賃貸住居費 (家賃＋電気代)
                     </span>
-                    <span className="text-sm md:text-base font-bold text-slate-700 block mt-0.5">
+                    <span className="text-base font-bold text-slate-700 block mt-0.5">
                       {results.currentHousingCost.toLocaleString()} 円/月
                     </span>
                   </div>
                   {/* 白飛びしていた金額を濃いネイビー(#0A1D37)に修正 */}
                   <div className="bg-[#A3B899]/10 p-3 rounded-xl border border-[#A3B899]/20 text-center">
-                    <span className="text-[#0A1D37] text-[9px] md:text-[10px] font-bold block">
+                    <span className="text-[#0A1D37] text-[10px] font-bold block">
                       購入後の実質住居費 (ローン＋電気代−太陽光売電)
                     </span>
-                    <span className="text-sm md:text-base text-[#0A1D37] font-bold block mt-0.5">
+                    <span className="text-base text-[#0A1D37] font-bold block mt-0.5">
                       {results.actualHousingCost.toLocaleString()} 円/月
                     </span>
                   </div>
                 </div>
 
                 <div className="bg-[#0A1D37] text-white p-3.5 rounded-xl text-center shadow-md">
-                  <p className="text-[9px] md:text-[10px] text-[#C89D7C] font-bold">
+                  <p className="text-[10px] text-[#C89D7C] font-bold">
                     住み替えることで得られる生涯の家計改善効果（ローン返済期間）
                   </p>
-                  <p className="text-xs md:text-sm font-bold mt-1">
-                    毎月{' '}
-                    <span className="text-sm md:text-base text-[#C89D7C] font-extrabold">
+                  <p className="text-sm font-bold mt-1">
+                    毎月 {' '}
+                    <span className="text-base text-[#C89D7C] font-extrabold">
                       {results.monthlyDiff.toLocaleString()} 円
                     </span>{' '}
                     の家計負担を削減！
                   </p>
-                  <p className="text-[8px] md:text-[9px] text-slate-300 mt-1">
+                  <p className="text-[9px] text-slate-300 mt-1">
                     返済期間の生涯合計で{' '}
                     <strong className="text-white text-xs font-extrabold">
                       {results.lifetimeDiff.toLocaleString()} 円
