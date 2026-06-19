@@ -31,6 +31,7 @@ interface Property {
   subsidy_man?: number;
   user_modified_misc?: boolean;
   user_modified_subsidy?: boolean;
+  other_funding_man?: number;
 }
 
 interface FinanceCalculatorClientProps {
@@ -72,6 +73,10 @@ export default function FinanceCalculatorClient({
   );
   const [userModifiedSubsidy, setUserModifiedSubsidy] = useState(
     property.user_modified_subsidy || false
+  );
+  // その他調達資金のステート
+  const [otherFunding, setOtherFunding] = useState<number>(
+    property.other_funding_man !== undefined ? property.other_funding_man : 0
   );
 
   // 金利、期間、年収
@@ -179,8 +184,8 @@ export default function FinanceCalculatorClient({
     // 総事業費
     const totalProjectCost = priceMan + renovationCost + finalMiscCost + solarCost;
 
-    // ローン借入額 (万円) ＝ 総事業費 − 頭金 − 補助金（支払割当）
-    const loanAmount = Math.max(0.0, totalProjectCost - downPayment - finalSubsidy);
+    // ローン借入額 (万円) ＝ 総事業費 − 頭金 − 補助金（支払割当） − その他調達資金
+    const loanAmount = Math.max(0.0, totalProjectCost - downPayment - finalSubsidy - otherFunding);
     const loanAmountYen = loanAmount * 10000;
 
     // ローン返済額計算
@@ -294,6 +299,7 @@ export default function FinanceCalculatorClient({
             subsidy_man: typeof subsidyInput === 'number' ? subsidyInput : undefined,
             user_modified_misc: userModifiedMisc,
             user_modified_subsidy: userModifiedSubsidy,
+            other_funding_man: otherFunding,
           },
         }),
       });
@@ -386,18 +392,34 @@ export default function FinanceCalculatorClient({
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        height: 250mm !important; /* A3印刷可能範囲(285mm)にヘッダー・フッター込みで完全に収める */
+        height: 238mm !important; /* A3の印刷範囲を考慮し、ヘッダー・フッター込みで確実に収める */
       }
-      /* 印刷時のみ、各セクション間のマージンやテーブル内余白をタイトにする */
+      /* 印刷時のみ、各セクション間のマージンやテーブル内余白をさらにタイトにする */
       .space-y-5 > * + * {
-        margin-top: 0.35rem !important;
+        margin-top: 0.25rem !important;
       }
       .space-y-3 > * + * {
-        margin-top: 0.3rem !important;
+        margin-top: 0.2rem !important;
       }
-      /* テーブルやカードのパディングを印刷時のみ縮める */
+      /* テーブルやカードのパディングを印刷時のみ極限まで縮める */
       #printArea .p-4, #printArea .p-3.5, #printArea .p-3 {
-        padding: 0.65rem !important;
+        padding: 0.45rem !important;
+      }
+      /* 印刷時のみ、文字サイズを一回り小さくしてはみ出しを防止 */
+      #printArea {
+        font-size: 9px !important;
+      }
+      #printArea h2 {
+        font-size: 12px !important;
+      }
+      #printArea h3 {
+        font-size: 10px !important;
+      }
+      #printArea strong, #printArea span {
+        font-size: 9px !important;
+      }
+      #printArea .text-base, #printArea .text-lg {
+        font-size: 11px !important;
       }
       input, select, textarea {
         border: none !important;
@@ -409,7 +431,7 @@ export default function FinanceCalculatorClient({
       textarea {
         resize: none !important;
         overflow: hidden !important;
-        height: 65px !important; /* 印刷時は高さを65pxに固定して1ページに収める */
+        height: 50px !important; /* 印刷時は高さを50pxに固定して1ページに収める */
       }
     }
   `;
@@ -553,8 +575,8 @@ export default function FinanceCalculatorClient({
               </div>
             </div>
 
-            {/* 諸費用 & 補助金（手入力切替可能） */}
-            <div className="grid grid-cols-2 gap-3">
+            {/* 諸費用 & 補助金（手入力切替可能） & その他調達資金 */}
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="block text-sm font-bold text-[#0A1D37] mb-1.5 leading-tight">
                   諸費用想定 (空欄で自動)
@@ -583,6 +605,22 @@ export default function FinanceCalculatorClient({
                     value={subsidyInput}
                     onChange={e => handleSubsidyInput(e.target.value)}
                     placeholder={insulationPlan === 'premium' ? '150万' : insulationPlan === 'standard' ? '100万' : '0万'}
+                  />
+                  <span className="text-sm text-[#0A1D37] font-bold whitespace-nowrap flex-shrink-0">
+                    万円
+                  </span>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5 leading-tight">
+                  その他調達資金 (贈与等)
+                </label>
+                <div className="flex items-center gap-1.5">
+                  <input
+                    type="number"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    value={otherFunding || ''}
+                    onChange={e => setOtherFunding(parseFloat(e.target.value) || 0)}
                   />
                   <span className="text-sm text-[#0A1D37] font-bold whitespace-nowrap flex-shrink-0">
                     万円
@@ -876,9 +914,9 @@ export default function FinanceCalculatorClient({
                       <span>③ 省エネ補助金 (支払割当分):</span>
                       <span className="font-extrabold">🎁 {results.finalSubsidy.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5 text-slate-400">
+                    <div className="flex justify-between border-b border-slate-100 pb-1.5 text-slate-700">
                       <span>④ その他調達資金:</span>
-                      <span className="font-extrabold">0.0 万円</span>
+                      <span className="font-extrabold text-slate-900">{otherFunding.toFixed(1)} 万円</span>
                     </div>
                     <div className="flex justify-between border-t border-[#0A1D37]/30 pt-2 font-bold text-[#0A1D37] text-xs md:text-sm">
                       <span>調達資金合計:</span>
