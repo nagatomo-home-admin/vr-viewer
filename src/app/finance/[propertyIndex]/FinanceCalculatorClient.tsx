@@ -27,6 +27,10 @@ interface Property {
   annual_income_man?: number;
   property_url?: string;
   advisor_comment?: string;
+  misc_cost_man?: number;
+  subsidy_man?: number;
+  user_modified_misc?: boolean;
+  user_modified_subsidy?: boolean;
 }
 
 interface FinanceCalculatorClientProps {
@@ -57,10 +61,18 @@ export default function FinanceCalculatorClient({
   const [downPayment, setDownPayment] = useState(property.down_payment_man || 0);
 
   // 諸費用と補助金の手動/自動切り替えフラグ
-  const [miscCostInput, setMiscCostInput] = useState<number | ''>('');
-  const [subsidyInput, setSubsidyInput] = useState<number | ''>('');
-  const [userModifiedMisc, setUserModifiedMisc] = useState(false);
-  const [userModifiedSubsidy, setUserModifiedSubsidy] = useState(false);
+  const [miscCostInput, setMiscCostInput] = useState<number | ''>(
+    property.misc_cost_man !== undefined ? property.misc_cost_man : ''
+  );
+  const [subsidyInput, setSubsidyInput] = useState<number | ''>(
+    property.subsidy_man !== undefined ? property.subsidy_man : ''
+  );
+  const [userModifiedMisc, setUserModifiedMisc] = useState(
+    property.user_modified_misc || false
+  );
+  const [userModifiedSubsidy, setUserModifiedSubsidy] = useState(
+    property.user_modified_subsidy || false
+  );
 
   // 金利、期間、年収
   const [rate, setRate] = useState(bankConfig[property.bank_id || 'miya-bank']?.rate || 0.975);
@@ -278,6 +290,10 @@ export default function FinanceCalculatorClient({
             annual_income_man: annualIncome,
             property_url: propUrl,
             advisor_comment: advisorComment,
+            misc_cost_man: typeof miscCostInput === 'number' ? miscCostInput : undefined,
+            subsidy_man: typeof subsidyInput === 'number' ? subsidyInput : undefined,
+            user_modified_misc: userModifiedMisc,
+            user_modified_subsidy: userModifiedSubsidy,
           },
         }),
       });
@@ -370,11 +386,18 @@ export default function FinanceCalculatorClient({
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        height: 268mm !important; /* 少し高さを抑えて確実に1ページに収める */
+        height: 250mm !important; /* A3印刷可能範囲(285mm)にヘッダー・フッター込みで完全に収める */
       }
-      /* 要素間の縦余白を微調整 */
+      /* 印刷時のみ、各セクション間のマージンやテーブル内余白をタイトにする */
       .space-y-5 > * + * {
-        margin-top: 0.5rem !important;
+        margin-top: 0.35rem !important;
+      }
+      .space-y-3 > * + * {
+        margin-top: 0.3rem !important;
+      }
+      /* テーブルやカードのパディングを印刷時のみ縮める */
+      #printArea .p-4, #printArea .p-3.5, #printArea .p-3 {
+        padding: 0.65rem !important;
       }
       input, select, textarea {
         border: none !important;
@@ -386,7 +409,7 @@ export default function FinanceCalculatorClient({
       textarea {
         resize: none !important;
         overflow: hidden !important;
-        height: 70px !important; /* 印刷時は高さを70pxに固定して1ページに収める */
+        height: 65px !important; /* 印刷時は高さを65pxに固定して1ページに収める */
       }
     }
   `;
