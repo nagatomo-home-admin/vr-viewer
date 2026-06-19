@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { saveHearingData } from "@/lib/db";
 
-// スマート提案ボードの入力データをJSONファイルとしてサーバー側に直接上書き保存するAPI
+// スマート提案ボードの入力データをJSONファイルまたはVercel KVとして上書き保存するAPI
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -25,32 +24,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // 保存ディレクトリの決定
-    const dirPath = path.join(process.cwd(), "src", "data", "hearing");
-    
-    // ディレクトリが存在しない場合は自動作成
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
+    // Vercel KV（またはローカルJSON）へ保存
+    const success = await saveHearingData(safeCustomerId, data.customerName || "", data);
 
-    const filePath = path.join(dirPath, `${safeCustomerId}.json`);
-    
-    // JSONファイルとして上書き保存（Vercel等のReadOnly環境ではログ出力のみで成功としてフォールバック）
-    let isReadOnly = false;
-    try {
-      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
-    } catch (fsError: any) {
-      console.warn("Server filesystem is read-only. Skipped physical file write:", fsError.message);
-      isReadOnly = true;
+    if (success) {
+      return NextResponse.json({ success: true, customerId: safeCustomerId });
+    } else {
+      throw new Error("Failed to save data via saveHearingData");
     }
-
-    return NextResponse.json({ success: true, customerId: safeCustomerId, isReadOnly });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Failed to save hearing data:", error);
     return NextResponse.json(
-      { error: "Internal Server Error" },
+      { error: "Internal Server Error", details: error.message || String(error) },
       { status: 500 }
     );
   }
 }
+
 

@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { getHearingData } from "@/lib/db";
 
-// 指定された顧客IDのJSONデータをサーバー側から読み込むAPI
+// 指定された顧客IDのデータ（JSONまたはVercel KV）を読み込むAPI
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
@@ -18,25 +17,17 @@ export async function GET(request: Request) {
 
     // 顧客IDの安全な形式チェック
     const safeCustomerId = customerId.replace(/[^a-zA-Z0-9-_]/g, "");
-    const filePath = path.join(
-      process.cwd(),
-      "src",
-      "data",
-      "hearing",
-      `${safeCustomerId}.json`
-    );
 
-    // ファイルが存在するか確認
-    if (!fs.existsSync(filePath)) {
+    // Vercel KV（またはローカルJSON）から取得
+    const data = await getHearingData(safeCustomerId);
+
+    // データが存在するか確認
+    if (!data) {
       return NextResponse.json(
         { error: "Customer data not found" },
         { status: 404 }
       );
     }
-
-    // JSONファイルを読み込んで解析して返す
-    const fileContent = fs.readFileSync(filePath, "utf8");
-    const data = JSON.parse(fileContent);
 
     return NextResponse.json(data);
   } catch (error) {
@@ -47,3 +38,4 @@ export async function GET(request: Request) {
     );
   }
 }
+

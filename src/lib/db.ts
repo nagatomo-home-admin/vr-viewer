@@ -107,3 +107,147 @@ export async function getBankConfig(): Promise<any> {
   }
   return {};
 }
+
+/**
+ * 顧客のヒアリングデータ（お住まい探し計画書）を取得します (Vercel KV または ローカル)
+ */
+export async function getHearingData(customerId: string): Promise<any | null> {
+  if (kv) {
+    try {
+      const data = await kv.get(`hearing:${customerId}`);
+      if (data) {
+        return typeof data === 'string' ? JSON.parse(data) : data;
+      }
+    } catch (e) {
+      console.error(`Vercel KVからのヒアリングデータ(${customerId})取得に失敗しました。ローカルファイルにフォールバックします:`, e);
+    }
+  }
+
+  // ローカルJSONファイルからの読み込み
+  try {
+    const LOCAL_HEARING_PATH = path.join(process.cwd(), 'src', 'data', 'hearing', `${customerId}.json`);
+    if (fs.existsSync(LOCAL_HEARING_PATH)) {
+      const content = fs.readFileSync(LOCAL_HEARING_PATH, 'utf8');
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.error("ローカルヒアリングデータの読み込みエラー:", e);
+  }
+  return null;
+}
+
+/**
+ * 顧客のヒアリングデータ（お住まい探し計画書）を保存します (Vercel KV または ローカル)
+ */
+export async function saveHearingData(customerId: string, customerName: string, data: any): Promise<boolean> {
+  if (kv) {
+    try {
+      // 1. 各個別顧客データを保存
+      await kv.set(`hearing:${customerId}`, data);
+      
+      // 2. 顧客IDリストの更新
+      const list = await getHearingList();
+      const updatedList = list.filter((c: any) => c.id !== customerId);
+      updatedList.unshift({ id: customerId, name: customerName ? `${customerName}様` : `${customerId}様` });
+      await kv.set('hearing_list', updatedList);
+      
+      console.log(`Vercel KVへヒアリングデータ(${customerId})を保存しました`);
+      return true;
+    } catch (e) {
+      console.error(`Vercel KVへのヒアリングデータ(${customerId})保存に失敗しました。ローカルファイルへの書き込みを行います:`, e);
+    }
+  }
+
+  // ローカルJSONファイルへの保存
+  try {
+    const dir = path.join(process.cwd(), 'src', 'data', 'hearing');
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const filePath = path.join(dir, `${customerId}.json`);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    console.log(`ローカルJSONファイルへヒアリングデータ(${customerId})を保存しました`);
+    return true;
+  } catch (e) {
+    console.error("ローカルヒアリングデータの保存エラー:", e);
+    return false;
+  }
+}
+
+/**
+ * 顧客のヒアリングデータ一覧を取得します
+ */
+export async function getHearingList(): Promise<any[]> {
+  if (kv) {
+    try {
+      const data = await kv.get('hearing_list');
+      if (data) {
+        return typeof data === 'string' ? JSON.parse(data) : (Array.isArray(data) ? data : []);
+      }
+    } catch (e) {
+      console.error("Vercel KVからの顧客IDリスト取得に失敗しました。ローカルディレクトリ走査にフォールバックします:", e);
+    }
+  }
+
+  // ローカルディレクトリの走査
+  try {
+    const dir = path.join(process.cwd(), 'src', 'data', 'hearing');
+    if (fs.existsSync(dir)) {
+      const files = fs.readdirSync(dir);
+      const list = [];
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const id = file.replace('.json', '');
+          try {
+            const content = fs.readFileSync(path.join(dir, file), 'utf8');
+            const parsed = JSON.parse(content);
+            const clientName = parsed.customerName ? `${parsed.customerName}様` : `${id}様`;
+            list.push({ id, name: clientName });
+          } catch (e) {
+            list.push({ id, name: `${id}様` });
+          }
+        }
+      }
+      return list;
+    }
+  } catch (e) {
+    console.error("ローカルヒアリングリストの走査エラー:", e);
+  }
+  return [];
+}
+
+/**
+ * 顧客のヒアリングデータ（お住まい探し計画書）を削除します
+ */
+export async function deleteHearingData(customerId: string): Promise<boolean> {
+  if (kv) {
+    try {
+      // 1. 各個別顧客データを削除
+      await kv.del(`hearing:${customerId}`);
+      
+      // 2. 顧客IDリストから削除
+      const list = await getHearingList();
+      const updatedList = list.filter((c: any) => c.id !== customerId);
+      await kv.set('hearing_list', updatedList);
+      
+      console.log(`Vercel KVからヒアリングデータ(${customerId})を削除しました`);
+      return true;
+    } catch (e) {
+      console.error(`Vercel KVからのヒアリングデータ(${customerId})削除に失敗しました。ローカルファイルの削除を行います:`, e);
+    }
+  }
+
+  // ローカルJSONファイルの削除
+  try {
+    const filePath = path.join(process.cwd(), 'src', 'data', 'hearing', `${customerId}.json`);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`ローカルJSONファイルからヒアリングデータ(${customerId})を削除しました`);
+      return true;
+    }
+  } catch (e) {
+    console.error("ローカルヒアリングデータの削除エラー:", e);
+  }
+  return false;
+}
+
