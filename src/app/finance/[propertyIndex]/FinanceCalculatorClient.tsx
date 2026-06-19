@@ -363,7 +363,7 @@ export default function FinanceCalculatorClient({
   const printStyles = `
     @page {
       size: A3 landscape !important;
-      margin: 6mm !important;
+      /* margin指定を削除し、ブラウザのデフォルト余白に委ねます */
     }
     @media print {
       html, body {
@@ -927,7 +927,7 @@ export default function FinanceCalculatorClient({
                       <span>② 自己資金 (頭金投入分):</span>
                       <span className="font-bold text-slate-900">{downPayment.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-150 pb-1 text-slate-700 font-bold">
+                    <div className="flex justify-between border-b border-slate-150 pb-1 text-slate-700">
                       <span>③ 省エネ補助金 (支払割当分):</span>
                       <span>🎁 {results.finalSubsidy.toFixed(1)} 万円</span>
                     </div>
