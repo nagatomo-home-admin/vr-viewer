@@ -428,7 +428,7 @@ export default function FinanceCalculatorClient({
       </div>
 
       {/* A3横サイズを意識した横型大判カード（1400px設計・縦幅拡張版） */}
-      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[800px]">
+      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[800px] h-fit">
         {/* ヘッダー */}
         <div className="bg-[#0A1D37] text-white px-8 py-5 flex justify-between items-center border-b border-slate-800 flex-shrink-0">
           <div>
@@ -445,7 +445,7 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                左半分：入力フォーム（営業マン・社長操作用）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-4 p-6 space-y-8 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col">
+          <div className="col-span-12 lg:col-span-4 p-6 space-y-12 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col">
             {/* シミュレーション見出しを大きく太く調整 */}
             <h2 className="text-lg font-extrabold text-[#0A1D37] border-b-2 border-[#0A1D37]/20 pb-2 flex items-center gap-1.5 uppercase tracking-wide">
               ⚙️ 資金計画シミュレーション入力
