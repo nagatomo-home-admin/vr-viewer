@@ -94,6 +94,21 @@ export default function FinanceCalculatorClient({
   // マウント時に状態を設定
   useEffect(() => {
     setMounted(true);
+    // 背景色の途切れを防ぐため、html と body の高さと背景色を上書き
+    document.documentElement.style.height = 'auto';
+    document.documentElement.style.minHeight = '100%';
+    document.body.style.height = 'auto';
+    document.body.style.minHeight = '100%';
+    document.body.style.backgroundColor = '#f1f5f9';
+
+    return () => {
+      // クリーンアップ
+      document.documentElement.style.height = '';
+      document.documentElement.style.minHeight = '';
+      document.body.style.height = '';
+      document.body.style.minHeight = '';
+      document.body.style.backgroundColor = '';
+    };
   }, []);
 
   // 銀行の変更時
@@ -442,7 +457,7 @@ export default function FinanceCalculatorClient({
                 <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">物件名</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                   value={propName}
                   onChange={e => setPropName(e.target.value)}
                 />
@@ -450,7 +465,7 @@ export default function FinanceCalculatorClient({
               <div>
                 <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">地銀ローン選択</label>
                 <select
-                  className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                  className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                   value={bankId}
                   onChange={e => handleBankChange(e.target.value)}
                 >
@@ -473,7 +488,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={priceMan}
                     onChange={e => setPriceMan(parseFloat(e.target.value) || 0)}
                   />
@@ -487,7 +502,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={renovationCost}
                     onChange={e => setRenovationCost(parseFloat(e.target.value) || 0)}
                   />
@@ -501,7 +516,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={downPayment}
                     onChange={e => setDownPayment(parseFloat(e.target.value) || 0)}
                   />
@@ -521,7 +536,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={miscCostInput}
                     onChange={e => handleMiscInput(e.target.value)}
                     placeholder={`${Math.round((priceMan * 0.08 + renovationCost * 0.03 + 60.0) * 10) / 10}万`}
@@ -538,7 +553,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={subsidyInput}
                     onChange={e => handleSubsidyInput(e.target.value)}
                     placeholder={insulationPlan === 'premium' ? '150万' : insulationPlan === 'standard' ? '100万' : '0万'}
@@ -558,7 +573,7 @@ export default function FinanceCalculatorClient({
                   <input
                     type="number"
                     step="0.001"
-                    className="w-full text-center py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full text-center py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={rate}
                     onChange={e => setRate(parseFloat(e.target.value) || 0)}
                   />
@@ -572,7 +587,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full text-center py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full text-center py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={termYears}
                     onChange={e => setTermYears(parseInt(e.target.value) || 35)}
                   />
@@ -586,7 +601,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full text-center py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full text-center py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={annualIncome}
                     onChange={e => setAnnualIncome(parseFloat(e.target.value) || 0)}
                   />
@@ -672,7 +687,7 @@ export default function FinanceCalculatorClient({
                 type="checkbox"
                 checked={solarOption}
                 onChange={e => setSolarOption(e.target.checked)}
-                className="h-5 w-5 text-[#0A1D37] rounded border-slate-350 focus:ring-[#C89D7C] cursor-pointer"
+                className="h-5 w-5 text-[#0A1D37] rounded border-slate-300 focus:ring-[#C89D7C] cursor-pointer"
               />
             </div>
 
@@ -683,7 +698,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={currentRent}
                     onChange={e => setCurrentRent(parseFloat(e.target.value) || 0)}
                   />
@@ -697,7 +712,7 @@ export default function FinanceCalculatorClient({
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={currentElectric}
                     onChange={e => setCurrentElectric(parseFloat(e.target.value) || 0)}
                   />
@@ -715,7 +730,7 @@ export default function FinanceCalculatorClient({
               </label>
               <input
                 type="text"
-                className="w-full pl-8 pr-3 py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full pl-8 pr-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 value={propUrl}
                 onChange={e => setPropUrl(e.target.value)}
                 placeholder="物件URLを入力してください"
@@ -735,11 +750,11 @@ export default function FinanceCalculatorClient({
                     <span className="text-[10px] font-bold text-white bg-[#0A1D37] px-2.5 py-0.5 rounded">
                       融資申込用
                     </span>
-                    <h2 className="text-sm md:text-base font-bold text-slate-805 flex items-center gap-1">
+                    <h2 className="text-sm md:text-base font-bold text-[#0A1D37] flex items-center gap-1">
                       御申込予定者様名：
                       <input
                         type="text"
-                        className="border-b border-slate-400 focus:outline-none focus:border-[#0A1D37] font-bold px-2 py-0.5 text-xs md:text-sm w-36 md:w-44 bg-transparent text-slate-850"
+                        className="border-b border-slate-400 focus:outline-none focus:border-[#0A1D37] font-bold px-2 py-0.5 text-xs md:text-sm w-36 md:w-44 bg-transparent text-[#0A1D37]"
                         placeholder="（顧客名を入力）"
                         value={clientName}
                         onChange={e => setClientName(e.target.value)}
@@ -764,11 +779,11 @@ export default function FinanceCalculatorClient({
                   </div>
                   {/* 捺印枠 */}
                   <div className="flex items-center gap-1.5 -mt-1.5">
-                    <div className="border border-slate-350 w-11 text-center text-[7px] text-slate-400 rounded">
+                    <div className="border border-slate-300 w-11 text-center text-[7px] text-slate-400 rounded">
                       <div className="bg-slate-50 py-0.5 border-b border-slate-200 font-bold">検印</div>
                       <div className="h-7"></div>
                     </div>
-                    <div className="border border-slate-350 w-11 text-center text-[7px] text-slate-400 rounded">
+                    <div className="border border-slate-300 w-11 text-center text-[7px] text-slate-400 rounded">
                       <div className="bg-slate-50 py-0.5 border-b border-slate-200 font-bold">担当</div>
                       <div className="h-7"></div>
                     </div>
@@ -863,7 +878,7 @@ export default function FinanceCalculatorClient({
                     <span>{getBankName()}</span> / {termYears}年返済）
                   </p>
                 </div>
-                <div className="space-y-1.5 border-l border-slate-250 pl-4">
+                <div className="space-y-1.5 border-l border-slate-200 pl-4">
                   <p className="text-slate-500 font-bold">【金融機関 審査基準目安】</p>
                   <p className="text-slate-800">
                     ■ 返済負担率 (DTI換算値):{' '}
@@ -913,7 +928,7 @@ export default function FinanceCalculatorClient({
               <div className="space-y-3">
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-slate-100/70 p-3 rounded-xl border border-slate-200 text-center">
-                    <span className="text-slate-505 text-[9px] md:text-[10px] font-bold block">
+                    <span className="text-[#0A1D37]/70 text-[9px] md:text-[10px] font-bold block">
                       現在の賃貸住居費 (家賃＋電気代)
                     </span>
                     <span className="text-sm md:text-base font-bold text-slate-700 block mt-0.5">
