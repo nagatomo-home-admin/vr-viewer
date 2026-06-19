@@ -128,6 +128,15 @@ export default function FinanceCalculatorClient({
     };
   }, []);
 
+  // 顧客名や物件名が変更されたらブラウザタイトルを動的に更新する（印刷時のPDFデフォルトファイル名に反映される）
+  useEffect(() => {
+    if (mounted) {
+      const displayClient = clientName.trim() ? `${clientName.trim()}様` : '';
+      const displayProp = propName.trim() ? ` (${propName.trim()})` : '';
+      document.title = `【資金計画書】${displayClient}${displayProp} | 長友ホーム`;
+    }
+  }, [clientName, propName, mounted]);
+
   // 銀行の変更時
   const handleBankChange = (newBankId: string) => {
     setBankId(newBankId);
@@ -380,8 +389,8 @@ export default function FinanceCalculatorClient({
         padding: 0 !important;
         height: 100% !important;
       }
-      /* 印刷時はグリッドレイアウトを無効化して全幅にする */
-      .grid {
+      /* 印刷時は外側の左右分割グリッドのみ無効化して全幅にする */
+      .grid-cols-12 {
         display: block !important;
       }
       .no-print {
@@ -418,8 +427,8 @@ export default function FinanceCalculatorClient({
         background-color: transparent !important;
         border: none !important;
       }
-      /* 親要素のグリッドと分割線を印刷時に無効化し、印刷エリアを横幅いっぱいにフィットさせる */
-      .grid {
+      /* 印刷時は外側の左右分割グリッドのみ無効化し、印刷エリアを横幅いっぱいにフィットさせる */
+      .grid-cols-12 {
         display: block !important;
       }
       .divide-x > :not([hidden]) ~ :not([hidden]) {
