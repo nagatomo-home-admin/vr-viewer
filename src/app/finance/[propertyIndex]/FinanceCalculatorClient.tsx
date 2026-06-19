@@ -123,7 +123,7 @@ export default function FinanceCalculatorClient({
 
   // データの自動計算
   const calcResults = () => {
-    // 諸費用の算出
+    // 諸費用を算出
     let finalMiscCost: number;
     if (!userModifiedMisc) {
       // 物件価格の8% ＋ リノベ工事費の3% ＋ 雑費60万
@@ -615,7 +615,7 @@ export default function FinanceCalculatorClient({
                     onChange={() => setInsulationPlan('none')}
                   />
                   <span className="text-sm font-extrabold text-[#0A1D37] block leading-tight">未改修 (UA 1.5)</span>
-                  <span className="text-xs font-bold text-slate-500 mt-2 leading-tight block">
+                  <span className="text-xs font-bold text-slate-505 mt-2 leading-tight block">
                     エアコン代目安
                     <br />
                     1.6万円/月
@@ -726,7 +726,7 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                右半分：資金計画書（銀行提出用レイアウト）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-8 p-6 flex flex-col justify-between" id="printArea">
+          <div className="col-span-12 lg:col-span-8 p-6 flex flex-col justify-start gap-4" id="printArea">
             <div className="space-y-5">
               {/* 融資申込ヘッダー情報 */}
               <div className="flex justify-between items-start border-b-2 border-[#0A1D37] pb-3">
@@ -735,7 +735,7 @@ export default function FinanceCalculatorClient({
                     <span className="text-[10px] font-bold text-white bg-[#0A1D37] px-2.5 py-0.5 rounded">
                       融資申込用
                     </span>
-                    <h2 className="text-sm md:text-base font-bold text-slate-800 flex items-center gap-1">
+                    <h2 className="text-sm md:text-base font-bold text-slate-805 flex items-center gap-1">
                       御申込予定者様名：
                       <input
                         type="text"
@@ -954,17 +954,17 @@ export default function FinanceCalculatorClient({
             </div>
 
             {/* 物件特徴とアドバイス (手動で編集可能) */}
-            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-4">
-              <span className="text-[8px] md:text-[9px] font-bold text-slate-400 tracking-wider block uppercase">
+            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2 flex-grow flex flex-col">
+              <span className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider block uppercase">
                 📝 物件特徴とプロの融資審査向けアドバイス (画面上で編集・追記可能です)
               </span>
               <textarea
                 value={advisorComment}
                 onChange={e => setAdvisorComment(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[90px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none flex-grow min-h-[100px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 placeholder="アドバイスを記述してください..."
               />
-              <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1">
+              <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1 flex-shrink-0">
                 ※諸費用概算の内訳目安：仲介手数料、登録免許税（所有権移転・抵当権設定）、登記代行費用、融資手数料・保証料、火災保険料（10年）、契約印紙代等が含まれます。工事費および補助金は設計および国の交付規定に基づき精算されます。
               </div>
             </div>
