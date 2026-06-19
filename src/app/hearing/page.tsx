@@ -1461,16 +1461,6 @@ export default function HearingPage() {
         {/* 右側：スライドプレビューエリア */}
         <div className="flex-grow min-w-0 p-8 overflow-y-auto flex flex-col items-center bg-slate-200 relative">
           
-          {/* フルスクリーン解除用フローティングボタン（フルスクリーン時のみ表示） */}
-          {isFullscreen && (
-            <button
-              onClick={() => document.exitFullscreen()}
-              className="fixed top-4 right-4 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xl z-50 transition no-print flex items-center gap-1.5"
-            >
-              ✕ フルスクリーン解除
-            </button>
-          )}
-
           {/* サイドバー折りたたみトグルボタン */}
           <div className={`w-full max-w-[1100px] mb-4 flex justify-between items-center no-print`}>
             <div>
@@ -1510,13 +1500,32 @@ export default function HearingPage() {
           {/* スライド実体リスト（印刷時はこの部分がA3横単位で改ページされる） */}
           <div 
             id="slides-container" 
-            className={`w-full transition-all duration-300 ${
+            className={`w-full transition-all duration-300 relative ${
               isFullscreen 
                 ? "bg-[#0d1b2e] overflow-y-auto h-screen p-12 flex flex-col items-center [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#0d1b2e] [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full" 
                 : ""
             }`}
           >
+            {/* フルスクリーン解除用フローティングボタン（フルスクリーン時のみ表示。フルスクリーン対象要素の内側に配置することで表示を維持） */}
+            {isFullscreen && (
+              <button
+                onClick={() => {
+                  if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                  } else if ((document as any).webkitExitFullscreen) {
+                    (document as any).webkitExitFullscreen();
+                  } else if ((document as any).msExitFullscreen) {
+                    (document as any).msExitFullscreen();
+                  }
+                }}
+                className="fixed top-4 right-4 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xl z-50 transition no-print flex items-center gap-1.5 cursor-pointer"
+              >
+                ✕ フルスクリーン解除
+              </button>
+            )}
+
             <div className="space-y-8 print:space-y-0 print:p-0 w-full max-w-[1100px]">
+
             {/* スライド1: 概要 & 今後のロードマップ */}
             <div 
               style={{ aspectRatio: "1.414 / 1", paddingLeft: "96px", paddingRight: "48px", paddingTop: "56px", paddingBottom: "56px" }}
