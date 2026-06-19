@@ -35,10 +35,16 @@ export async function POST(request: Request) {
 
     const filePath = path.join(dirPath, `${safeCustomerId}.json`);
     
-    // JSONファイルとして上書き保存
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+    // JSONファイルとして上書き保存（Vercel等のReadOnly環境ではログ出力のみで成功としてフォールバック）
+    let isReadOnly = false;
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+    } catch (fsError: any) {
+      console.warn("Server filesystem is read-only. Skipped physical file write:", fsError.message);
+      isReadOnly = true;
+    }
 
-    return NextResponse.json({ success: true, customerId: safeCustomerId });
+    return NextResponse.json({ success: true, customerId: safeCustomerId, isReadOnly });
   } catch (error) {
     console.error("Failed to save hearing data:", error);
     return NextResponse.json(
@@ -47,3 +53,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

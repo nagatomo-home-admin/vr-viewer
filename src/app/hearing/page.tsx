@@ -435,9 +435,9 @@ export default function HearingPage() {
     }
   };
 
-  // 資金計画API（ポート3005）への自動転送保存
+  // 資金計画への自動転送保存
   const handleShareData = async () => {
-    setShareStatus({ type: "info", message: "資金計画API（ポート3005）へデータ共有を転送中..." });
+    setShareStatus({ type: "info", message: "資金計画にデータを共有中..." });
     
     try {
       const response = await fetch("/api/presentation/share", {
@@ -449,7 +449,12 @@ export default function HearingPage() {
           customerName: data.customerName,
           currentRent: data.currentRent,
           propertyPrice: data.propertyPrice,
-          renovePrice: data.renovePrice
+          renovePrice: data.renovePrice,
+          customerId: data.customerId,
+          selfFund: data.selfFund,
+          loanRate: data.loanRate,
+          loanTerm: data.loanTerm,
+          otherExpense: data.otherExpense
         })
       });
 
@@ -461,16 +466,17 @@ export default function HearingPage() {
           message: `データ共有＆資金計画の再生成に成功しました！\n（連携物件: ${result.propertyName}）` 
         });
       } else {
-                throw new Error(result.error || "データ転送に失敗しました。");
+        throw new Error(result.error || "データ共有に失敗しました。");
       }
     } catch (error: any) {
       console.error(error);
       setShareStatus({ 
         type: "error", 
-        message: `資金計画API(3005)連携に失敗しました。\n※VBS起動でポート3005が立ち上がっているかご確認ください。\n(エラー: ${error.message})` 
+        message: `資金計画連携に失敗しました。\n(エラー: ${error.message})` 
       });
     }
   };
+
 
   // 各個別入力フォームの変更ハンドラ
   const handleInputChange = (field: keyof CustomerData, value: any) => {
@@ -1419,48 +1425,36 @@ export default function HearingPage() {
               )}
             </div>
 
-            {/* 出力とデータ連携 */}
+            {/* データの初期化・削除 */}
             <div className="space-y-3 pt-2">
               <h3 
                 onClick={() => toggleMenu("output")}
                 className="font-bold text-white border-l-4 border-[#D9A05B] pl-2 pb-0.5 text-xs bg-[#132A4A]/40 hover:bg-[#132A4A]/70 py-1 pr-2 rounded-r flex items-center justify-between cursor-pointer transition select-none"
               >
                 <span className="flex items-center gap-1.5">
-                  <span>📤</span> 出力とデータ連携
+                  <span>⚙️</span> データの初期化・削除
                 </span>
                 <span className="text-[10px] text-slate-400 font-bold">{menuOpen.output ? "▼" : "▶"}</span>
               </h3>
               {menuOpen.output && (
                 <div className="flex flex-col gap-2 px-1">
                   <button 
-                    onClick={handleShareData}
-                    className="w-full bg-[#132A4A] hover:bg-[#1e3d6b] text-white font-bold text-xs py-2.5 px-3 rounded-xl border border-white/10 transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
+                    onClick={handleClearAll}
+                    className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-xs py-2.5 px-3 rounded-xl border border-red-500/20 transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
                   >
-                    🔗 資金計画データ共有 (ポート3005)
+                    🧹 全クリア
                   </button>
                   <button 
-                    onClick={handlePrint}
-                    className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs py-2.5 px-3 rounded-xl transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
+                    onClick={handleDeleteServer}
+                    disabled={!data.customerId}
+                    className="w-full bg-rose-600 hover:bg-rose-500 disabled:opacity-30 text-white font-bold text-xs py-2.5 px-3 rounded-xl transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
                   >
-                    🖨️ PDFを保存 (印刷画面を開く)
+                    🗑️ データ削除
                   </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button 
-                      onClick={handleExportHtml}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 px-2 rounded-xl border border-slate-800 transition shadow flex items-center justify-center gap-1 whitespace-nowrap"
-                    >
-                      🌐 HTML書出
-                    </button>
-                    <button 
-                      onClick={handleSaveJson}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 px-2 rounded-xl border border-slate-800 transition shadow flex items-center justify-center gap-1 whitespace-nowrap"
-                    >
-                      💾 JSON保存
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
+
 
           </div>
         </div>
