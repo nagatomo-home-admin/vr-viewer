@@ -29,6 +29,7 @@ interface FinancePortalClientProps {
  * 資金計画ポータル（クライアントコンポーネント）
  * 高級感のあるナガトモ・テーマ（ネイビー & ゴールド & セージ）による
  * レスポンシブ対応の物件一覧・ソート・新規作成画面を提供します。
+ * 入力欄の文字の視認性、カードの高級ホバー、可読性を劇的に向上させたUI改善版。
  */
 export default function FinancePortalClient({ initialProperties, customerIds }: FinancePortalClientProps) {
   const [properties, setProperties] = useState<Property[]>(initialProperties);
@@ -39,7 +40,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
 
-  // コンポーネントマウント時にソートを実行
+  // コンポーネントマウント時およびソートキー変更時にソートを実行
   useEffect(() => {
     sortPropertiesList();
   }, [sortKey, sortOrder]);
@@ -122,9 +123,9 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-between">
+    <div className="min-h-screen bg-slate-100 flex flex-col justify-between">
       {/* ヘッダー */}
-      <header className="bg-[#0A1D37] text-white py-6 shadow-md flex-shrink-0">
+      <header className="bg-[#0A1D37] text-white py-6 shadow-lg flex-shrink-0 border-b border-[#C89D7C]/20">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center w-full gap-4">
           <div>
             <span className="text-[#C89D7C] text-xs font-bold tracking-widest uppercase block">
@@ -135,7 +136,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
             </h1>
           </div>
           <div className="text-right text-xs text-slate-400">
-            <p className="bg-[#0A1D37]/50 border border-slate-700/50 px-3 py-1 rounded-full text-[#C89D7C] font-bold">
+            <p className="bg-[#0A1D37]/50 border border-slate-700/50 px-4 py-1.5 rounded-full text-[#C89D7C] font-bold shadow-inner">
               クラウド移行版 (Vercel KV対応)
             </p>
           </div>
@@ -145,10 +146,10 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
       {/* メインコンテンツ */}
       <main className="max-w-6xl mx-auto px-6 py-10 flex-grow w-full">
         {/* 使い方バナー */}
-        <div className="mb-8 p-4 bg-yellow-50 border-l-4 border-[#C89D7C] rounded-r-lg text-xs md:text-sm text-slate-700 shadow-sm flex items-start gap-2.5">
-          <span className="text-lg">💡</span>
+        <div className="mb-8 p-5 bg-yellow-50 border-l-4 border-[#C89D7C] rounded-r-xl text-xs md:text-sm text-slate-700 shadow-sm flex items-start gap-3">
+          <span className="text-xl flex-shrink-0">💡</span>
           <div>
-            <strong className="font-bold">使い方:</strong> 対象物件の「資金計画提案書を開く」ボタンをクリックすると、A3印刷対応のシミュレーター画面が開きます。新規物件を追加する場合は、下部の自動作成フォームにURLを入力して作成してください。
+            <strong className="font-bold text-slate-800">使い方:</strong> 対象物件の「資金計画提案書を開く」ボタンをクリックすると、A3印刷対応のシミュレーター画面が開きます。新規物件を追加する場合は、下部の自動作成フォームにURLを入力して作成してください。
           </div>
         </div>
 
@@ -167,13 +168,13 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
                 value={urlInput}
                 onChange={e => setUrlInput(e.target.value)}
                 disabled={loading}
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#C89D7C] bg-slate-50/50"
+                className="w-full px-4 py-2.5 border border-slate-400 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#C89D7C] bg-white text-slate-800 font-bold placeholder-slate-400"
                 placeholder="例: https://www.m-shinko.co.jp/sale/detail/600309-6103"
               />
             </div>
             <div className="md:col-span-4">
               <label className="block text-xs font-bold text-slate-700 mb-1.5">
-                👤 顧客ID（省略時は新規作成、指定時はプレゼン図面データと面積連動）
+                👤 顧客ID（省略時は新規、指定時は図面面積連動）
               </label>
               <input
                 type="text"
@@ -181,7 +182,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
                 onChange={e => setCustomerIdInput(e.target.value)}
                 disabled={loading}
                 list="customerIdList"
-                className="w-full px-4 py-2.5 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#C89D7C] bg-slate-50/50"
+                className="w-full px-4 py-2.5 border border-slate-400 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-[#C89D7C] bg-white text-slate-800 font-bold placeholder-slate-400"
                 placeholder="例: tanaka-reno"
               />
               <datalist id="customerIdList">
@@ -194,7 +195,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#C89D7C] hover:bg-[#C89D7C]/90 text-[#0A1D37] font-bold py-2.5 px-4 rounded-xl shadow transition duration-150 text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="w-full bg-[#C89D7C] hover:bg-[#0A1D37] hover:text-[#C89D7C] text-[#0A1D37] border border-[#C89D7C] font-bold py-2.5 px-4 rounded-xl shadow transition-all duration-200 text-xs flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {loading ? '作成中...' : '🚀 作成する'}
               </button>
@@ -205,7 +206,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
               className={`mt-4 p-3 rounded-lg text-xs font-bold ${
                 statusMessage.isError
                   ? 'bg-red-50 text-red-600 border border-red-100'
-                  : 'bg-slate-50 text-slate-600 border border-slate-100'
+                  : 'bg-slate-50 text-slate-600 border border-slate-200'
               }`}
             >
               {statusMessage.text}
@@ -224,7 +225,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
               <select
                 value={sortKey}
                 onChange={e => setSortKey(e.target.value as any)}
-                className="border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white font-bold text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="border border-slate-350 rounded-lg px-2.5 py-1.5 bg-white font-bold text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
               >
                 <option value="index">登録順</option>
                 <option value="price">本体価格</option>
@@ -251,35 +252,35 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
             return (
               <div
                 key={originalIndex}
-                className="bg-white rounded-2xl shadow-md border border-slate-200 p-6 hover:shadow-xl transition-shadow duration-200 flex flex-col justify-between"
+                className="bg-white rounded-3xl shadow-md border border-slate-200 p-6 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between hover:border-[#C89D7C]/50 group"
               >
                 <div>
-                  <div className="flex justify-between items-start mb-4 gap-2">
-                    <h2 className="text-base md:text-lg font-bold text-[#0A1D37] line-clamp-2 leading-snug">
+                  <div className="flex justify-between items-start mb-4 gap-3">
+                    <h2 className="text-base md:text-lg font-bold text-[#0A1D37] line-clamp-2 leading-snug group-hover:text-[#C89D7C] transition-colors duration-200">
                       {item.property_name}
                     </h2>
-                    <span className="bg-[#A3B899]/15 text-[#0A1D37] text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0">
+                    <span className="bg-[#A3B899]/15 text-[#0A1D37] text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0 shadow-sm">
                       {item.client_name ? '個別提案' : '標準モデル'}
                     </span>
                   </div>
-                  <div className="space-y-2 text-xs md:text-sm text-slate-600 mb-6">
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5">
-                      <span>物件本体価格:</span>
-                      <span className="font-bold text-slate-900">{item.price_man.toLocaleString()} 万円</span>
+                  <div className="space-y-2.5 text-xs md:text-sm text-slate-650 mb-6 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                    <div className="flex justify-between border-b border-slate-200/60 pb-2">
+                      <span className="text-slate-500 font-medium">物件本体価格:</span>
+                      <span className="font-extrabold text-slate-800 text-sm">{item.price_man.toLocaleString()} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5">
-                      <span>想定リノベーション費用:</span>
-                      <span className="font-bold text-slate-900">{item.renovation_cost_man.toLocaleString()} 万円</span>
+                    <div className="flex justify-between border-b border-slate-200/60 pb-2">
+                      <span className="text-slate-500 font-medium">想定リノベーション費用:</span>
+                      <span className="font-extrabold text-slate-800 text-sm">{item.renovation_cost_man.toLocaleString()} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-100 pb-1.5 font-bold text-[#0A1D37] bg-slate-50 p-1.5 rounded -mx-1.5">
-                      <span>総事業費目安 (税込):</span>
-                      <span>{totalCost.toLocaleString()} 万円</span>
+                    <div className="flex justify-between font-bold text-[#0A1D37] bg-white border border-[#0A1D37]/10 p-2 rounded-xl">
+                      <span className="font-bold">総事業費目安 (税込):</span>
+                      <span className="text-base font-black text-[#0A1D37]">{totalCost.toLocaleString()} 万円</span>
                     </div>
                   </div>
                 </div>
                 <Link
                   href={`/finance/${originalIndex}`}
-                  className="block w-full text-center bg-[#0A1D37] hover:bg-[#0A1D37]/90 text-white font-bold py-3 px-4 rounded-xl shadow transition duration-150 text-xs md:text-sm cursor-pointer"
+                  className="block w-full text-center bg-[#0A1D37] hover:bg-[#C89D7C] hover:text-[#0A1D37] border border-[#0A1D37] text-white font-bold py-3.5 px-4 rounded-2xl shadow-md hover:shadow-lg transition-all duration-250 text-xs md:text-sm cursor-pointer"
                 >
                   📂 資金計画提案書を開く
                 </Link>
@@ -290,7 +291,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
       </main>
 
       {/* フッター */}
-      <footer className="bg-slate-100 border-t border-slate-200 py-6 text-center text-xs text-slate-500 flex-shrink-0 font-medium">
+      <footer className="bg-slate-100 border-t border-slate-200 py-6 text-center text-xs text-slate-500 flex-shrink-0 font-semibold">
         © Nagatomo Home Co., Ltd. All Rights Reserved.
       </footer>
     </div>
