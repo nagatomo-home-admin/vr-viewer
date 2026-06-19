@@ -911,7 +911,7 @@ export default function HearingPage() {
             value={data.customerId || ""}
             className="bg-[#132A4A] text-white border border-white/20 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#D9A05B] cursor-pointer mr-1 whitespace-nowrap"
           >
-            <option value="">📂 保存データを選択...</option>
+            <option value="">📂 保存データの読込み...</option>
             {savedCustomers.map((c) => (
               <option key={c.id} value={c.id} className="text-slate-900 bg-white">{c.name} ({c.id})</option>
             ))}
@@ -921,22 +921,21 @@ export default function HearingPage() {
             onClick={handleSaveServer}
             className="bg-[#D9A05B] hover:bg-[#D9A05B]/90 text-[#0A192F] font-bold text-xs px-3 py-2 rounded-xl transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
           >
-            💾 上書き保存
+            💾 サーバーに上書き保存
           </button>
 
           <button 
-            onClick={handleDeleteServer}
-            disabled={!data.customerId}
-            className="bg-rose-600 hover:bg-rose-500 disabled:opacity-30 text-white font-bold text-xs px-3 py-2 rounded-xl transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
+            onClick={handleShareData}
+            className="bg-[#132A4A] hover:bg-[#1e3d6b] text-white font-bold text-xs px-3 py-2 rounded-xl border border-white/10 transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
           >
-            🗑️ データ削除
+            🔗 資金計画にデータを共有
           </button>
 
           <button 
-            onClick={handleClearAll}
-            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-xs px-3 py-2 rounded-xl border border-red-500/20 transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
+            onClick={handlePrint}
+            className="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs px-3 py-2 rounded-xl transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
           >
-            🧹 全クリア
+            🖨️ PDFを保存
           </button>
 
           <button 
