@@ -144,6 +144,7 @@ export async function POST(req: Request) {
     const newProperty = {
       property_name: propertyName,
       client_name: clientName ? `${clientName} 様` : '',
+      customer_id: customerId || '', // 顧客IDを連携・保存
       price_man: scrapedData.priceMan,
       renovation_cost_man: calculatedRenovationCost,
       down_payment_man: 0,

@@ -4,7 +4,7 @@ import { getProperties, saveProperties } from "@/lib/db";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { customerName, currentRent, propertyPrice, renovePrice } = body;
+    const { customerName, currentRent, propertyPrice, renovePrice, customerId } = body;
 
     if (!customerName) {
       return NextResponse.json({ error: '顧客名は必須パラメータです。' }, { status: 400 });
@@ -19,6 +19,7 @@ export async function POST(req: Request) {
     const newProperty = {
       property_name: propertyName,
       client_name: `${customerName} 様`,
+      customer_id: customerId || '',               // 顧客IDを連携・保存
       price_man: propertyPrice || 1500,           // 物件費用 (万円)
       renovation_cost_man: renovePrice || 1000,    // リノベ費用 (万円)
       down_payment_man: 0,

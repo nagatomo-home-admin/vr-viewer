@@ -2,6 +2,7 @@
     {
         "property_name": "田中様ご提案物件 (都城市南鷹尾町\r\n価格：400万円)",
         "client_name": "田中 様",
+        "customer_id": "tanaka-reno",
         "price_man": 400,
         "renovation_cost_man": 1490,
         "down_payment_man": 0,

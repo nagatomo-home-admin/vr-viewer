@@ -6,6 +6,7 @@ import Link from 'next/link';
 interface Property {
   property_name: string;
   client_name?: string;
+  customer_id?: string;
   price_man: number;
   renovation_cost_man: number;
   down_payment_man?: number;
@@ -256,9 +257,18 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
               >
                 <div>
                   <div className="flex justify-between items-start mb-4 gap-3">
-                    <h2 className="text-base md:text-lg font-bold text-[#0A1D37] line-clamp-2 leading-snug group-hover:text-[#C89D7C] transition-colors duration-200">
-                      {item.property_name}
-                    </h2>
+                    <div className="flex flex-col gap-1.5 flex-grow">
+                      <h2 className="text-base md:text-lg font-bold text-[#0A1D37] line-clamp-2 leading-snug group-hover:text-[#C89D7C] transition-colors duration-200">
+                        {item.property_name}
+                      </h2>
+                      {item.customer_id && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-[10px] font-bold text-[#C89D7C] bg-[#0A1D37] px-2 py-0.5 rounded-md shadow-sm">
+                            👤 顧客ID: {item.customer_id}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <span className="bg-[#A3B899]/15 text-[#0A1D37] text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0 shadow-sm">
                       {item.client_name ? '個別提案' : '標準モデル'}
                     </span>
