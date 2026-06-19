@@ -900,12 +900,6 @@ export default function HearingPage() {
         
         {/* 各種アクションボタン */}
         <div className="flex gap-2 items-center flex-wrap">
-          <Link href="/presentation">
-            <button className="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs px-3 py-2 rounded-xl transition shadow flex items-center gap-1 mr-1 whitespace-nowrap">
-              📊 提案ポータルへ
-            </button>
-          </Link>
-          
           <select
             onChange={(e) => handleLoadServer(e.target.value)}
             value={data.customerId || ""}
