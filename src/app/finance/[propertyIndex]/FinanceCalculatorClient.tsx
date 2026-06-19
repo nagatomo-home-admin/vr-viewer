@@ -367,8 +367,8 @@ export default function FinanceCalculatorClient({
     }
     @media print {
       html, body {
-        width: 420mm !important;
-        height: 297mm !important;
+        width: 100% !important; /* 自動縮小フィットさせて見切れを防ぐ */
+        height: auto !important;
         background-color: white !important;
         color: #0A1D37 !important;
         padding: 0 !important;
@@ -401,8 +401,9 @@ export default function FinanceCalculatorClient({
       div.w-full.flex-1 {
         padding: 0 !important;
         margin: 0 !important;
-        height: 285mm !important;
-        max-height: 285mm !important;
+        width: 100% !important;
+        height: 280mm !important;
+        max-height: 280mm !important;
         overflow: hidden !important;
       }
       .print-card {
@@ -412,11 +413,11 @@ export default function FinanceCalculatorClient({
         max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: 272mm !important; /* 安全マージンを考慮した用紙全体の縦幅 */
-        max-height: 272mm !important;
+        height: 268mm !important; /* 安全マージンを考慮した用紙全体の縦幅 */
+        max-height: 268mm !important;
         overflow: hidden !important; /* 2ページ目を絶対に発生させない */
       }
-      /* 入力欄の背景や枠線を印刷向けにすっきりさせる */
+      /* 入力欄 of 背景や枠線を印刷向けにすっきりさせる */
       input, select, textarea {
         border: none !important;
         background-color: transparent !important;
@@ -447,7 +448,7 @@ export default function FinanceCalculatorClient({
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important; /* 等間隔に美しく分散配置 */
-        height: 232mm !important; /* 要素が詰まらないよう高さを確保 */
+        height: 230mm !important; /* 要素が詰まらないよう高さを確保 */
       }
     }
   `;
@@ -926,7 +927,7 @@ export default function FinanceCalculatorClient({
                       <span>② 自己資金 (頭金投入分):</span>
                       <span className="font-bold text-slate-900">{downPayment.toFixed(1)} 万円</span>
                     </div>
-                    <div className="flex justify-between border-b border-slate-150 pb-1 text-[#A3B899] font-bold">
+                    <div className="flex justify-between border-b border-slate-150 pb-1 text-slate-700 font-bold">
                       <span>③ 省エネ補助金 (支払割当分):</span>
                       <span>🎁 {results.finalSubsidy.toFixed(1)} 万円</span>
                     </div>
