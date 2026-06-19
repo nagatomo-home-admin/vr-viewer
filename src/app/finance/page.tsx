@@ -2,6 +2,12 @@ import fs from 'fs';
 import path from 'path';
 import { getProperties } from '@/lib/db';
 import FinancePortalClient from './FinancePortalClient';
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'マイホーム資金計画',
+  description: '長友ホームのマイホーム資金計画ポータル。',
+};
 
 // ページを常に最新の状態に保つため、キャッシュを無効化します
 export const revalidate = 0;

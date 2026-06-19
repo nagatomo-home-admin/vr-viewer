@@ -16,7 +16,7 @@ const outfit = Outfit({
 
 // アプリケーションのメタデータ（SEOおよびタイトル設定）
 export const metadata: Metadata = {
-  title: "リノベーション Before/After 図面比較・注釈システム",
+  title: "図面比較・変更点AI抽出",
   description: "AI（Gemini）を活用してリノベーション図面の変更点を自動抽出し、注釈を管理・書き出しするシステムです。",
 };
 

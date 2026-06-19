@@ -20,20 +20,28 @@ export async function generateMetadata({ params }: FinanceDetailPageProps): Prom
   const resolvedParams = await params;
   const index = parseInt(resolvedParams.propertyIndex);
   if (isNaN(index) || index < 0) {
-    return { title: 'マイホーム資金計画書 | 長友ホーム' };
+    return { title: 'マイホーム資金計画 | 長友ホーム' };
   }
   const properties = await getProperties();
   if (index >= properties.length) {
-    return { title: 'マイホーム資金計画書 | 長友ホーム' };
+    return { title: 'マイホーム資金計画 | 長友ホーム' };
   }
   const property = properties[index];
   const clientName = property.client_name?.replace(/ 様$/, '') || '';
   const propName = property.property_name || '';
-  const displayClient = clientName.trim() ? `${clientName.trim()}様` : '';
-  const displayProp = propName.trim() ? ` (${propName.trim()})` : '';
+  
+  // 顧客名がある場合は「マイホーム資金計画 | 顧客名様」
+  // 顧客名がなく物件名がある場合は「マイホーム資金計画 | 物件名」
+  // いずれも無い場合は「マイホーム資金計画」
+  let pageTitle = 'マイホーム資金計画';
+  if (clientName.trim()) {
+    pageTitle = `マイホーム資金計画 | ${clientName.trim()}様`;
+  } else if (propName.trim()) {
+    pageTitle = `マイホーム資金計画 | ${propName.trim()}`;
+  }
   
   return {
-    title: `【資金計画書】${displayClient}${displayProp} | 長友ホーム`,
+    title: `${pageTitle} | 長友ホーム`,
   };
 }
 

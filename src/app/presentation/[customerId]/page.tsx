@@ -34,8 +34,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     // エラー時はフォールバック
   }
 
+  // 「AI提案プレゼンボード | 物件名（または顧客名）」の形式に統一します
+  const pageTitle = clientName ? `AI提案プレゼンボード | ${clientName}` : 'AI提案プレゼンボード';
+
   return {
-    title: `${clientName}様邸 リノベーション提案ボード | 長友ホーム`,
+    title: `${pageTitle} | 長友ホーム`,
     description: `長友ホームから${clientName}様へお届けする、リノベーションの設計コンセプト・空間コーディネート提案ボードです。`,
   };
 }
