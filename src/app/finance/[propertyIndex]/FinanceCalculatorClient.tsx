@@ -401,8 +401,8 @@ export default function FinanceCalculatorClient({
       div.w-full.flex-1 {
         padding: 0 !important;
         margin: 0 !important;
-        height: 290mm !important;
-        max-height: 290mm !important;
+        height: 285mm !important;
+        max-height: 285mm !important;
         overflow: hidden !important;
       }
       .print-card {
@@ -412,8 +412,8 @@ export default function FinanceCalculatorClient({
         max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: 275mm !important; /* 安全マージンを考慮した用紙全体の縦幅 */
-        max-height: 275mm !important;
+        height: 272mm !important; /* 安全マージンを考慮した用紙全体の縦幅 */
+        max-height: 272mm !important;
         overflow: hidden !important; /* 2ページ目を絶対に発生させない */
       }
       /* 入力欄の背景や枠線を印刷向けにすっきりさせる */
@@ -447,7 +447,7 @@ export default function FinanceCalculatorClient({
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important; /* 等間隔に美しく分散配置 */
-        height: 238mm !important; /* 要素が詰まらないよう高さを確保 */
+        height: 232mm !important; /* 要素が詰まらないよう高さを確保 */
       }
     }
   `;

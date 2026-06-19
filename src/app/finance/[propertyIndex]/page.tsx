@@ -1,6 +1,7 @@
 import { getProperties, getBankConfig } from '@/lib/db';
 import { notFound } from 'next/navigation';
 import FinanceCalculatorClient from './FinanceCalculatorClient';
+import { Metadata } from 'next';
 
 // キャッシュを無効化し、常に最新のVercel KV/JSONの値を参照します
 export const revalidate = 0;
@@ -9,6 +10,31 @@ interface FinanceDetailPageProps {
   params: Promise<{
     propertyIndex: string;
   }>;
+}
+
+/**
+ * 印刷デフォルト名（HTMLソース上のtitleタグ）を正しくするため、
+ * サーバーサイドから動的なメタデータを配信します。
+ */
+export async function generateMetadata({ params }: FinanceDetailPageProps): Promise<Metadata> {
+  const resolvedParams = await params;
+  const index = parseInt(resolvedParams.propertyIndex);
+  if (isNaN(index) || index < 0) {
+    return { title: 'マイホーム資金計画書 | 長友ホーム' };
+  }
+  const properties = await getProperties();
+  if (index >= properties.length) {
+    return { title: 'マイホーム資金計画書 | 長友ホーム' };
+  }
+  const property = properties[index];
+  const clientName = property.client_name?.replace(/ 様$/, '') || '';
+  const propName = property.property_name || '';
+  const displayClient = clientName.trim() ? `${clientName.trim()}様` : '';
+  const displayProp = propName.trim() ? ` (${propName.trim()})` : '';
+  
+  return {
+    title: `【資金計画書】${displayClient}${displayProp} | 長友ホーム`,
+  };
 }
 
 /**
