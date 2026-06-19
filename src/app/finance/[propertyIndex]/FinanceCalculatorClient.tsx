@@ -384,43 +384,19 @@ export default function FinanceCalculatorClient({
       .grid {
         display: block !important;
       }
-      #printArea {
+      .no-print {
+        display: none !important;
+      }
+      .print-card {
+        box-shadow: none !important;
+        border: none !important;
         width: 100% !important;
         max-width: 100% !important;
-        padding: 0 !important;
         margin: 0 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        justify-content: space-between !important;
-        height: 238mm !important; /* A3の印刷範囲を考慮し、ヘッダー・フッター込みで確実に収める */
+        padding: 0 !important;
+        height: auto !important;
       }
-      /* 印刷時のみ、各セクション間のマージンやテーブル内余白をさらにタイトにする */
-      .space-y-5 > * + * {
-        margin-top: 0.25rem !important;
-      }
-      .space-y-3 > * + * {
-        margin-top: 0.2rem !important;
-      }
-      /* テーブルやカードのパディングを印刷時のみ極限まで縮める */
-      #printArea .p-4, #printArea .p-3.5, #printArea .p-3 {
-        padding: 0.45rem !important;
-      }
-      /* 印刷時のみ、文字サイズを一回り小さくしてはみ出しを防止 */
-      #printArea {
-        font-size: 9px !important;
-      }
-      #printArea h2 {
-        font-size: 12px !important;
-      }
-      #printArea h3 {
-        font-size: 10px !important;
-      }
-      #printArea strong, #printArea span {
-        font-size: 9px !important;
-      }
-      #printArea .text-base, #printArea .text-lg {
-        font-size: 11px !important;
-      }
+      /* 入力欄の背景や枠線を印刷向けにすっきりさせる */
       input, select, textarea {
         border: none !important;
         background-color: transparent !important;
@@ -428,10 +404,27 @@ export default function FinanceCalculatorClient({
         font-weight: bold !important;
         color: #0A1D37 !important;
       }
+      /* 印刷時にスクロールバーをなくし、テキストエリアの中身を全表示 */
       textarea {
         resize: none !important;
         overflow: hidden !important;
-        height: 50px !important; /* 印刷時は高さを50pxに固定して1ページに収める */
+        background-color: transparent !important;
+        border: none !important;
+      }
+      /* 親要素のグリッドと分割線を印刷時に無効化し、印刷エリアを横幅いっぱいにフィットさせる */
+      .grid {
+        display: block !important;
+      }
+      .divide-x > :not([hidden]) ~ :not([hidden]) {
+        border-left-width: 0px !important;
+      }
+      #printArea {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex-basis: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        height: auto !important;
       }
     }
   `;
@@ -473,7 +466,7 @@ export default function FinanceCalculatorClient({
       </div>
 
       {/* A3横サイズを意識した横型大判カード（1400px設計・縦幅拡張版） */}
-      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[710px] h-fit">
+      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-0 h-auto">
         {/* ヘッダー */}
         <div className="bg-[#0A1D37] text-white px-8 py-5 flex justify-between items-center border-b border-slate-800 flex-shrink-0">
           <div>
@@ -1032,18 +1025,18 @@ export default function FinanceCalculatorClient({
               </div>
             </div>
 
-            {/* 物件特徴とアドバイス (手動で編集可能) */}
-            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2 flex flex-col justify-between">
-              <span className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider block uppercase">
+            {/* 物件特徴とプロのアドバイス（編集可能なテキストエリア） */}
+            <div className="space-y-1.5 border-t border-slate-100 pt-3 flex-grow flex flex-col justify-end mt-3">
+              <span className="text-[9px] font-bold text-slate-500 tracking-wider block uppercase">
                 📝 物件特徴とプロの融資審査向けアドバイス (画面上で編集・追記可能です)
               </span>
               <textarea
                 value={advisorComment}
                 onChange={e => setAdvisorComment(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[95px] min-h-[95px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full p-3 border border-slate-200 rounded-xl text-[10px] leading-relaxed text-slate-700 bg-slate-50 resize-none h-[110px] min-h-[110px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 placeholder="アドバイスを記述してください..."
               />
-              <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1">
+              <div className="text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1.5">
                 ※諸費用概算の内訳目安：仲介手数料、登録免許税（所有権移転・抵当権設定）、登記代行費用、融資手数料・保証料、火災保険料（10年）、契約印紙代等が含まれます。工事費および補助金は設計および国の交付規定に基づき精算されます。
               </div>
             </div>
