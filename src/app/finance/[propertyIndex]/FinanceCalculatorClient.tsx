@@ -798,7 +798,7 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                右半分：資金計画書（銀行提出用レイアウト）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-8 p-6 flex flex-col justify-start gap-4 flex-grow" id="printArea">
+          <div className="col-span-12 lg:col-span-8 p-6 flex flex-col justify-between" id="printArea">
             <div className="space-y-5">
               {/* 融資申込ヘッダー情報 */}
               <div className="flex justify-between items-start border-b-2 border-[#0A1D37] pb-3">
@@ -919,33 +919,33 @@ export default function FinanceCalculatorClient({
                 </div>
               </div>
 
-              {/* 毎月返済額 & DTI審査 (行間とパディングを広げました) */}
-              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-[10px] md:text-xs leading-relaxed">
+              {/* 住宅ローン返済 ＆ DTI審査判定 */}
+              <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
                 <div className="space-y-1.5">
-                  <p className="text-slate-500 font-bold">【毎月返済額の試算】</p>
+                  <p className="text-slate-700 font-bold">【毎月返済額の試算】</p>
                   <p className="text-slate-800">
                     ■ 毎月の住宅ローン返済額:{' '}
-                    <strong className="text-base md:text-lg text-[#0A1D37] font-extrabold">
+                    <strong className="text-lg text-[#0A1D37] font-bold">
                       {results.monthlyPayment.toLocaleString()} 円
-                    </strong>
+                    </strong>{' '}
                     /月
                   </p>
-                  <p className="text-[8px] md:text-[9px] text-slate-400">
+                  <p className="text-[10px] text-slate-500">
                     ※適用金利：<strong className="text-[#0A1D37]">{rate.toFixed(3)}%</strong> （ローン先：
                     <span>{getBankName()}</span> / {termYears}年返済）
                   </p>
                 </div>
-                <div className="space-y-1.5 border-l border-slate-200 pl-4">
-                  <p className="text-slate-500 font-bold">【金融機関 審査基準目安】</p>
+                <div className="space-y-1.5">
+                  <p className="text-slate-700 font-bold">【金融機関 審査基準チェック】</p>
                   <p className="text-slate-800">
-                    ■ 返済負担率 (DTI換算値):{' '}
-                    <strong className="text-xs md:text-sm text-slate-900 font-bold">
+                    ■ 返済負担率 (DTI審査目安):{' '}
+                    <strong className="text-sm text-slate-900 font-bold">
                       {results.dtiRatio.toFixed(2)} %
                     </strong>
                   </p>
-                  <p className="text-[8px] md:text-[9px] flex items-center gap-1.5 mt-0.5">
-                    ■ 審査適正判定:
-                    <strong className="text-[8px] text-white bg-[#0A1D37] px-2.5 py-0.5 rounded-full font-bold shadow-sm">
+                  <p className="text-[10px] text-slate-500">
+                    ■ 地銀融資審査の適正判定:{' '}
+                    <strong className="text-xs text-white bg-[#0A1D37] px-2.5 py-0.5 rounded-full font-bold shadow-sm">
                       {results.dtiStatus}
                     </strong>
                   </p>
