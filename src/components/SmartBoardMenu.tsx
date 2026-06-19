@@ -119,13 +119,12 @@ export default function SmartBoardMenu() {
       {/* メニュー開閉ボタン */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-[#0A1D37] hover:bg-[#C89D7C] text-[#C89D7C] hover:text-[#0A1D37] border border-[#C89D7C] rounded-full shadow-lg transition-all duration-300 font-bold text-xs md:text-sm cursor-pointer"
+        className="flex items-center gap-1.5 px-3 py-1.5 bg-[#0A1D37] hover:bg-[#C89D7C] text-[#C89D7C] hover:text-[#0A1D37] border border-[#C89D7C] rounded-full shadow-lg transition-all duration-300 font-bold text-[11px] cursor-pointer"
         aria-expanded={isOpen}
       >
-        <span className="text-sm md:text-base">🛠️</span>
-        <span>スマート提案メニュー</span>
-        <span className={`text-[10px] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          ▲
+        <span>🛠️ メニュー</span>
+        <span className={`text-[9px] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          ▼
         </span>
       </button>
     </div>

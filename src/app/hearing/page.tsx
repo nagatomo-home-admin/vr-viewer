@@ -893,7 +893,8 @@ export default function HearingPage() {
           <div className="border border-[#D9A05B] rounded w-8 h-8 flex items-center justify-center font-black text-[#D9A05B]">N</div>
           <div>
             <span className="text-[#D9A05B] text-[10px] font-bold tracking-wider uppercase block">Nagatomo Home AI Strategy Office</span>
-            <h1 className="text-base font-bold">長友スマート提案ボード <span className="text-xs text-gray-300">（対話型お住まい探し計画書）</span></h1>
+            <h1 className="text-base font-bold leading-tight">長友スマート提案ボード</h1>
+            <span className="text-xs text-gray-300 block mt-0.5">（対話型お住まい探し計画書）</span>
           </div>
         </div>
         
@@ -944,16 +945,6 @@ export default function HearingPage() {
           >
             🖥️ フルスクリーン表示
           </button>
-
-          <button 
-            onClick={() => {
-              setHearingStep(0);
-              setIsHearingModalOpen(true);
-            }}
-            className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2 rounded-xl transition shadow flex items-center gap-1.5 whitespace-nowrap"
-          >
-            💬 対話で進める
-          </button>
         </div>
       </header>
 
@@ -970,12 +961,23 @@ export default function HearingPage() {
             <h2 className="text-sm font-bold text-white flex items-center gap-1.5">
               <span className="text-[#D9A05B]">✍️</span> 提案データの直接編集
             </h2>
-            <button 
-              onClick={() => setIsSidebarOpen(false)}
-              className="text-xs text-slate-400 hover:text-[#D9A05B] font-bold transition flex items-center gap-1"
-            >
-              ◀ 閉じる
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => {
+                  setHearingStep(0);
+                  setIsHearingModalOpen(true);
+                }}
+                className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[10px] px-2.5 py-1 rounded-lg transition shadow flex items-center gap-1 whitespace-nowrap"
+              >
+                💬 対話で進める
+              </button>
+              <button 
+                onClick={() => setIsSidebarOpen(false)}
+                className="text-xs text-slate-400 hover:text-[#D9A05B] font-bold transition flex items-center gap-1"
+              >
+                ◀ 閉じる
+              </button>
+            </div>
           </div>
           
           <div className="flex-grow overflow-y-auto p-4 space-y-6 text-xs text-slate-300 [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-700/60 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-600">
