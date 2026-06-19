@@ -15,6 +15,7 @@ interface BankConfig {
 interface Property {
   property_name: string;
   client_name?: string;
+  customer_id?: string;
   price_man: number;
   renovation_cost_man: number;
   down_payment_man?: number;
@@ -60,6 +61,8 @@ export default function FinanceCalculatorClient({
   const [priceMan, setPriceMan] = useState(property.price_man);
   const [renovationCost, setRenovationCost] = useState(property.renovation_cost_man);
   const [downPayment, setDownPayment] = useState(property.down_payment_man || 0);
+  const [customerId, setCustomerId] = useState(property.customer_id || '');
+
 
   // 諸費用と補助金の手動/自動切り替えフラグ
   const [miscCostInput, setMiscCostInput] = useState<number | ''>(
@@ -292,6 +295,7 @@ export default function FinanceCalculatorClient({
           propertyData: {
             property_name: propName,
             client_name: clientName ? `${clientName} 様` : '',
+            customer_id: customerId,
             price_man: priceMan,
             renovation_cost_man: renovationCost,
             down_payment_man: downPayment,
@@ -517,7 +521,7 @@ export default function FinanceCalculatorClient({
             </h2>
 
             {/* 物件設定 */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-3 gap-3">
               <div>
                 <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">物件名</label>
                 <input
@@ -543,6 +547,16 @@ export default function FinanceCalculatorClient({
                   <option value="ja-bank-fix">JA都城（固定 2.300%）</option>
                   <option value="flat35">フラット35（固定 1.900%）</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">顧客ID (保存用)</label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                  value={customerId}
+                  onChange={e => setCustomerId(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
+                  placeholder="例: tanaka-reno"
+                />
               </div>
             </div>
 

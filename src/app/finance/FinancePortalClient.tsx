@@ -30,16 +30,19 @@ interface FinancePortalClientProps {
  * 資金計画ポータル（クライアントコンポーネント）
  * 高級感のあるナガトモ・テーマ（ネイビー & ゴールド & セージ）による
  * レスポンシブ対応の物件一覧・ソート・新規作成画面を提供します。
- * 入力欄の文字の視認性、カードの高級ホバー、可読性を劇的に向上させたUI改善版。
+ * 顧客IDの後期登録・編集、プランの削除、初期表示「登録順・昇順」への対応版。
  */
 export default function FinancePortalClient({ initialProperties, customerIds }: FinancePortalClientProps) {
   const [properties, setProperties] = useState<Property[]>(initialProperties);
   const [urlInput, setUrlInput] = useState('');
   const [customerIdInput, setCustomerIdInput] = useState('');
   const [sortKey, setSortKey] = useState<'index' | 'price' | 'total' | 'name'>('index');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc'); // 初期表示を昇順（asc）に変更
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{ text: string; isError: boolean } | null>(null);
+
+  // 各カードでの顧客ID入力用一時ステート
+  const [editingCustomerIds, setEditingCustomerIds] = useState<{ [index: number]: string | undefined }>({});
 
   // コンポーネントマウント時およびソートキー変更時にソートを実行
   useEffect(() => {
@@ -123,6 +126,107 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
     }
   };
 
+  // 各カードでの顧客ID入力値変更処理
+  const handleCardCustomerIdChange = (originalIndex: number, val: string) => {
+    const safeVal = val.replace(/[^a-zA-Z0-9-_]/g, "");
+    setEditingCustomerIds(prev => ({
+      ...prev,
+      [originalIndex]: safeVal
+    }));
+  };
+
+  // 各カードでの顧客IDの更新処理
+  const handleSaveCardCustomerId = async (originalIndex: number) => {
+    const inputVal = editingCustomerIds[originalIndex];
+    if (inputVal === undefined) return;
+
+    setLoading(true);
+    setStatusMessage({ text: '⏳ 顧客IDを保存しています...', isError: false });
+
+    try {
+      const targetProperty = initialProperties[originalIndex];
+      const response = await fetch('/api/finance/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          index: originalIndex,
+          propertyData: {
+            ...targetProperty,
+            customer_id: inputVal
+          }
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setStatusMessage({ text: `✅ 顧客IDを「${inputVal}」に更新しました。`, isError: false });
+        
+        // ローカルステートの更新
+        const newProps = [...properties];
+        const pIdx = newProps.findIndex(p => initialProperties.indexOf(p) === originalIndex);
+        if (pIdx !== -1) {
+          newProps[pIdx] = { ...newProps[pIdx], customer_id: inputVal };
+          setProperties(newProps);
+        }
+        
+        // 編集モードを抜ける
+        setEditingCustomerIds(prev => ({
+          ...prev,
+          [originalIndex]: undefined
+        }));
+        
+        setTimeout(() => setStatusMessage(null), 3000);
+      } else {
+        throw new Error(result.error || '保存に失敗しました。');
+      }
+    } catch (error: any) {
+      console.error('Error saving customer ID:', error);
+      setStatusMessage({ text: `❌ ID保存エラー: ${error.message}`, isError: true });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 物件削除処理
+  const handleDeleteProperty = async (originalIndex: number, propName: string) => {
+    if (!confirm(`⚠️ 本当に「${propName}」の資金計画データを完全に削除しますか？\nこの操作は取り消せません。`)) {
+      return;
+    }
+
+    setLoading(true);
+    setStatusMessage({ text: '⏳ 資金計画データを削除しています...', isError: false });
+
+    try {
+      const response = await fetch('/api/finance/delete', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          index: originalIndex
+        }),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setStatusMessage({ text: `✅ データを正常に削除しました。`, isError: false });
+        setTimeout(() => {
+          window.location.reload();
+        }, 1500);
+      } else {
+        throw new Error(result.error || '削除に失敗しました。');
+      }
+    } catch (error: any) {
+      console.error('Error deleting property:', error);
+      setStatusMessage({ text: `❌ 削除エラー: ${error.message}`, isError: true });
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col justify-between">
       {/* ヘッダー */}
@@ -150,7 +254,7 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
         <div className="mb-8 p-5 bg-yellow-50 border-l-4 border-[#C89D7C] rounded-r-xl text-xs md:text-sm text-slate-700 shadow-sm flex items-start gap-3">
           <span className="text-xl flex-shrink-0">💡</span>
           <div>
-            <strong className="font-bold text-slate-800">使い方:</strong> 対象物件の「資金計画提案書を開く」ボタンをクリックすると、A3印刷対応のシミュレーター画面が開きます。新規物件を追加する場合は、下部の自動作成フォームにURLを入力して作成してください。
+            <strong className="font-bold text-slate-800">使い方:</strong> 対象物件の「資金計画提案書を開く」ボタンをクリックすると、A3印刷対応 of シミュレーター画面が開きます。新規物件を追加する場合は、下部の自動作成フォームにURLを入力して作成してください。
           </div>
         </div>
 
@@ -261,13 +365,45 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
                       <h2 className="text-base md:text-lg font-bold text-[#0A1D37] line-clamp-2 leading-snug group-hover:text-[#C89D7C] transition-colors duration-200">
                         {item.property_name}
                       </h2>
-                      {item.customer_id && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-[10px] font-bold text-[#C89D7C] bg-[#0A1D37] px-2 py-0.5 rounded-md shadow-sm">
-                            👤 顧客ID: {item.customer_id}
+                      
+                      {/* 顧客ID表示・追加・編集エリア */}
+                      <div className="flex flex-col gap-1 mt-1 bg-slate-50 p-2.5 rounded-xl border border-slate-150/40">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-[10px] font-bold text-[#C89D7C] bg-[#0A1D37] px-2.5 py-1 rounded-md shadow-sm whitespace-nowrap">
+                            👤 顧客ID: {item.customer_id || "未登録"}
                           </span>
+                          <button
+                            onClick={() => {
+                              setEditingCustomerIds(prev => ({
+                                ...prev,
+                                [originalIndex]: editingCustomerIds[originalIndex] !== undefined ? undefined : (item.customer_id || "")
+                              }));
+                            }}
+                            className="text-[10px] font-bold text-slate-500 hover:text-[#0A1D37] hover:underline whitespace-nowrap transition cursor-pointer"
+                          >
+                            {editingCustomerIds[originalIndex] !== undefined ? "閉じる" : (item.customer_id ? "編集" : "ID登録")}
+                          </button>
                         </div>
-                      )}
+                        
+                        {editingCustomerIds[originalIndex] !== undefined && (
+                          <div className="flex items-center gap-1.5 mt-2 no-print">
+                            <input
+                              type="text"
+                              value={editingCustomerIds[originalIndex] || ""}
+                              onChange={(e) => handleCardCustomerIdChange(originalIndex, e.target.value)}
+                              placeholder="IDを入力 (例: tanaka-reno)"
+                              className="px-2 py-1.5 text-xs border border-slate-300 rounded-lg bg-white text-slate-800 font-bold focus:outline-none focus:ring-1 focus:ring-[#C89D7C] flex-grow"
+                            />
+                            <button
+                              onClick={() => handleSaveCardCustomerId(originalIndex)}
+                              disabled={loading}
+                              className="bg-[#C89D7C] hover:bg-[#0A1D37] hover:text-[#C89D7C] text-[#0A1D37] border border-[#C89D7C] font-bold text-[10px] px-3 py-1.5 rounded-lg transition cursor-pointer disabled:opacity-50 whitespace-nowrap"
+                            >
+                              💾 保存
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </div>
                     <span className="bg-[#A3B899]/15 text-[#0A1D37] text-[10px] font-bold px-2.5 py-1 rounded-full whitespace-nowrap flex-shrink-0 shadow-sm">
                       {item.client_name ? '個別提案' : '標準モデル'}
@@ -288,12 +424,23 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
                     </div>
                   </div>
                 </div>
-                <Link
-                  href={`/finance/${originalIndex}`}
-                  className="block w-full text-center bg-[#0A1D37] hover:bg-[#C89D7C] hover:text-[#0A1D37] border border-[#0A1D37] text-white font-bold py-3.5 px-4 rounded-2xl shadow-md hover:shadow-lg transition-all duration-250 text-xs md:text-sm cursor-pointer"
-                >
-                  📂 資金計画提案書を開く
-                </Link>
+
+                <div className="flex gap-2 items-center mt-auto no-print">
+                  <Link
+                    href={`/finance/${originalIndex}`}
+                    className="flex-grow text-center bg-[#0A1D37] hover:bg-[#C89D7C] hover:text-[#0A1D37] border border-[#0A1D37] text-white font-bold py-3.5 px-4 rounded-2xl shadow-md hover:shadow-lg transition-all duration-250 text-xs md:text-sm cursor-pointer"
+                  >
+                    📂 資金計画提案書を開く
+                  </Link>
+                  <button
+                    onClick={() => handleDeleteProperty(originalIndex, item.property_name)}
+                    disabled={loading}
+                    className="bg-red-50 hover:bg-red-500 hover:text-white text-red-500 border border-red-200 hover:border-red-500 font-bold p-3.5 rounded-2xl shadow-sm transition-all cursor-pointer flex-shrink-0 disabled:opacity-50"
+                    title="計画書を完全に削除する"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
             );
           })}
@@ -307,3 +454,4 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
     </div>
   );
 }
+
