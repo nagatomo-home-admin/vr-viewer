@@ -413,7 +413,7 @@ export default function FinanceCalculatorClient({
       </div>
 
       {/* A3横サイズを意識した横型大判カード（1400px設計・縦幅拡張版） */}
-      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[840px]">
+      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[800px]">
         {/* ヘッダー */}
         <div className="bg-[#0A1D37] text-white px-8 py-5 flex justify-between items-center border-b border-slate-800 flex-shrink-0">
           <div>
@@ -430,7 +430,7 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                左半分：入力フォーム（営業マン・社長操作用）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-4 p-5 space-y-4 bg-slate-50/50 text-sm no-print h-full lg:min-h-full border-r border-slate-200">
+          <div className="col-span-12 lg:col-span-4 p-6 space-y-6 bg-slate-50/50 text-sm no-print h-full lg:min-h-full border-r border-slate-200">
             {/* シミュレーション見出しを大きく太く調整 */}
             <h2 className="text-lg font-extrabold text-[#0A1D37] border-b-2 border-[#0A1D37]/20 pb-2 flex items-center gap-1.5 uppercase tracking-wide">
               ⚙️ 資金計画シミュレーション入力
@@ -439,18 +439,18 @@ export default function FinanceCalculatorClient({
             {/* 物件設定 */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1">物件名</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">物件名</label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                  className="w-full px-3 py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                   value={propName}
                   onChange={e => setPropName(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1">地銀ローン選択</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">地銀ローン選択</label>
                 <select
-                  className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                  className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                   value={bankId}
                   onChange={e => handleBankChange(e.target.value)}
                 >
@@ -469,11 +469,11 @@ export default function FinanceCalculatorClient({
             {/* 資金計画 */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1 leading-tight">物件本体価格</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5 leading-tight">物件本体価格</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={priceMan}
                     onChange={e => setPriceMan(parseFloat(e.target.value) || 0)}
                   />
@@ -483,11 +483,11 @@ export default function FinanceCalculatorClient({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1 leading-tight">リノベ工事費用</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5 leading-tight">リノベ工事費用</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={renovationCost}
                     onChange={e => setRenovationCost(parseFloat(e.target.value) || 0)}
                   />
@@ -497,11 +497,11 @@ export default function FinanceCalculatorClient({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1 leading-tight">自己資金 (頭金)</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5 leading-tight">自己資金 (頭金)</label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={downPayment}
                     onChange={e => setDownPayment(parseFloat(e.target.value) || 0)}
                   />
@@ -515,13 +515,13 @@ export default function FinanceCalculatorClient({
             {/* 諸費用 & 補助金（手入力切替可能） */}
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1 leading-tight">
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5 leading-tight">
                   諸費用想定 (空欄で自動)
                 </label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={miscCostInput}
                     onChange={e => handleMiscInput(e.target.value)}
                     placeholder={`${Math.round((priceMan * 0.08 + renovationCost * 0.03 + 60.0) * 10) / 10}万`}
@@ -532,13 +532,13 @@ export default function FinanceCalculatorClient({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1 leading-tight">
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5 leading-tight">
                   省エネ補助金 (空欄で自動)
                 </label>
                 <div className="flex items-center gap-1.5">
                   <input
                     type="number"
-                    className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={subsidyInput}
                     onChange={e => handleSubsidyInput(e.target.value)}
                     placeholder={insulationPlan === 'premium' ? '150万' : insulationPlan === 'standard' ? '100万' : '0万'}
@@ -553,12 +553,12 @@ export default function FinanceCalculatorClient({
             {/* 金利・返済期間・年収 */}
             <div className="grid grid-cols-3 gap-3">
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1">適用金利</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">適用金利</label>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
                     step="0.001"
-                    className="w-full text-center py-2 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full text-center py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={rate}
                     onChange={e => setRate(parseFloat(e.target.value) || 0)}
                   />
@@ -568,11 +568,11 @@ export default function FinanceCalculatorClient({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1">返済期間</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">返済期間</label>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full text-center py-2 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full text-center py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={termYears}
                     onChange={e => setTermYears(parseInt(e.target.value) || 35)}
                   />
@@ -582,11 +582,11 @@ export default function FinanceCalculatorClient({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1">世帯年収</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">世帯年収</label>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full text-center py-2 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full text-center py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={annualIncome}
                     onChange={e => setAnnualIncome(parseFloat(e.target.value) || 0)}
                   />
@@ -602,7 +602,7 @@ export default function FinanceCalculatorClient({
               <label className="block text-sm font-bold text-[#0A1D37]">断熱性能プランの選択</label>
               <div className="grid grid-cols-3 gap-2">
                 <label
-                  className={`flex flex-col justify-between items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] ${
+                  className={`flex flex-col justify-center items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1.5 ${
                     insulationPlan === 'none' ? 'border-[#0A1D37] ring-2 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -615,14 +615,14 @@ export default function FinanceCalculatorClient({
                     onChange={() => setInsulationPlan('none')}
                   />
                   <span className="text-sm font-extrabold text-[#0A1D37] block leading-tight">未改修 (UA 1.5)</span>
-                  <span className="text-xs font-bold text-slate-505 mt-2 leading-tight block">
+                  <span className="text-xs font-bold text-slate-500 leading-tight block">
                     エアコン代目安
                     <br />
                     1.6万円/月
                   </span>
                 </label>
                 <label
-                  className={`flex flex-col justify-between items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] ${
+                  className={`flex flex-col justify-center items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1.5 ${
                     insulationPlan === 'standard' ? 'border-[#0A1D37] ring-2 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -635,14 +635,14 @@ export default function FinanceCalculatorClient({
                     onChange={() => setInsulationPlan('standard')}
                   />
                   <span className="text-sm font-extrabold text-[#0A1D37] block leading-tight">ZEH (UA 0.6)</span>
-                  <span className="text-xs font-bold text-[#A3B899] mt-2 leading-tight block">
+                  <span className="text-xs font-bold text-[#A3B899] leading-tight block">
                     エアコン: 8千円/月
                     <br />
                     (月8千円削減)
                   </span>
                 </label>
                 <label
-                  className={`flex flex-col justify-between items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] ${
+                  className={`flex flex-col justify-center items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1.5 ${
                     insulationPlan === 'premium' ? 'border-[#0A1D37] ring-2 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -655,7 +655,7 @@ export default function FinanceCalculatorClient({
                     onChange={() => setInsulationPlan('premium')}
                   />
                   <span className="text-sm font-extrabold text-[#0A1D37] block leading-tight">G2プレミアム</span>
-                  <span className="text-xs font-bold text-[#C89D7C] mt-2 leading-tight block">
+                  <span className="text-xs font-bold text-[#C89D7C] leading-tight block">
                     エアコン: 4千円/月
                     <br />
                     (月1.2万円節約)
@@ -679,11 +679,11 @@ export default function FinanceCalculatorClient({
             {/* 家賃比較のインプット */}
             <div className="grid grid-cols-2 gap-3 border-t border-slate-200 pt-3">
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1">現在の月家賃（管理費込）</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">現在の月家賃（管理費込）</label>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={currentRent}
                     onChange={e => setCurrentRent(parseFloat(e.target.value) || 0)}
                   />
@@ -693,11 +693,11 @@ export default function FinanceCalculatorClient({
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1">現在の月電気代目安</label>
+                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">現在の月電気代目安</label>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
-                    className="w-full px-2 py-2 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    className="w-full px-2 py-2.5 border border-slate-350 rounded-lg text-sm font-bold text-right bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                     value={currentElectric}
                     onChange={e => setCurrentElectric(parseFloat(e.target.value) || 0)}
                   />
@@ -710,12 +710,12 @@ export default function FinanceCalculatorClient({
 
             {/* QRコード用URLペースト欄 */}
             <div className="border-t border-slate-200 pt-3">
-              <label className="block text-sm font-bold text-[#0A1D37] mb-1">
+              <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">
                 🔗 物件掲載元URL (QRコードの生成用)
               </label>
               <input
                 type="text"
-                className="w-full pl-8 pr-3 py-2 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full pl-8 pr-3 py-2.5 border border-slate-350 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 value={propUrl}
                 onChange={e => setPropUrl(e.target.value)}
                 placeholder="物件URLを入力してください"
@@ -953,18 +953,18 @@ export default function FinanceCalculatorClient({
               </div>
             </div>
 
-            {/* 物件特徴とアドバイス (手動で編集可能) */}
-            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2 flex-grow flex flex-col">
+            {/* 物件特徴とアドバイス (手動で編集可能) - flex-growを削除して自然な配置へ */}
+            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2">
               <span className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider block uppercase">
                 📝 物件特徴とプロの融資審査向けアドバイス (画面上で編集・追記可能です)
               </span>
               <textarea
                 value={advisorComment}
                 onChange={e => setAdvisorComment(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none flex-grow min-h-[100px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[90px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 placeholder="アドバイスを記述してください..."
               />
-              <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1 flex-shrink-0">
+              <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1">
                 ※諸費用概算の内訳目安：仲介手数料、登録免許税（所有権移転・抵当権設定）、登記代行費用、融資手数料・保証料、火災保険料（10年）、契約印紙代等が含まれます。工事費および補助金は設計および国の交付規定に基づき精算されます。
               </div>
             </div>
