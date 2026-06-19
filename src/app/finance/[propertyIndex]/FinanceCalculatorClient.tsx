@@ -447,7 +447,7 @@ export default function FinanceCalculatorClient({
                ========================================== */}
           <div
             className="col-span-12 lg:col-span-4 p-6 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col"
-            style={{ gap: '2rem' }}
+            style={{ gap: '1rem' }}
           >
             {/* シミュレーション見出しを大きく太く調整 */}
             <h2 className="text-lg font-extrabold text-[#0A1D37] border-b-2 border-[#0A1D37]/20 pb-2 flex items-center gap-1.5 uppercase tracking-wide">
