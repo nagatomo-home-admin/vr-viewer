@@ -445,7 +445,10 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                左半分：入力フォーム（営業マン・社長操作用）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-4 p-6 space-y-7 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col">
+          <div
+            className="col-span-12 lg:col-span-4 p-6 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col"
+            style={{ gap: '2rem' }}
+          >
             {/* シミュレーション見出しを大きく太く調整 */}
             <h2 className="text-lg font-extrabold text-[#0A1D37] border-b-2 border-[#0A1D37]/20 pb-2 flex items-center gap-1.5 uppercase tracking-wide">
               ⚙️ 資金計画シミュレーション入力
@@ -741,7 +744,7 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                右半分：資金計画書（銀行提出用レイアウト）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-8 p-6 flex flex-col justify-start gap-4" id="printArea">
+          <div className="col-span-12 lg:col-span-8 p-6 flex flex-col justify-start gap-4 flex-grow" id="printArea">
             <div className="space-y-5">
               {/* 融資申込ヘッダー情報 */}
               <div className="flex justify-between items-start border-b-2 border-[#0A1D37] pb-3">
@@ -968,15 +971,15 @@ export default function FinanceCalculatorClient({
               </div>
             </div>
 
-            {/* 物件特徴とアドバイス (手動で編集可能) - flex-growを削除して自然な配置へ */}
-            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2">
+            {/* 物件特徴とアドバイス (手動で編集可能) - 空白を埋めるために flex-grow と flex-col を適用 */}
+            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2 flex-grow flex flex-col justify-between">
               <span className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider block uppercase">
                 📝 物件特徴とプロの融資審査向けアドバイス (画面上で編集・追記可能です)
               </span>
               <textarea
                 value={advisorComment}
                 onChange={e => setAdvisorComment(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[90px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none flex-grow min-h-[90px] h-auto focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 placeholder="アドバイスを記述してください..."
               />
               <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1">
