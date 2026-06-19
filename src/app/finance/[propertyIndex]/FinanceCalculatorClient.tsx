@@ -343,6 +343,24 @@ export default function FinanceCalculatorClient({
         padding: 0 !important;
         height: 100% !important;
       }
+      /* 印刷時はグリッドレイアウトを無効化して全幅にする */
+      .grid {
+        display: block !important;
+      }
+      #printArea {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        height: 275mm !important; /* A3の縦幅に収めて1ページにする */
+      }
+      /* 要素間の縦余白を微調整 */
+      .space-y-5 > * + * {
+        margin-top: 0.75rem !important;
+      }
       input, select, textarea {
         border: none !important;
         background-color: transparent !important;
@@ -353,17 +371,7 @@ export default function FinanceCalculatorClient({
       textarea {
         resize: none !important;
         overflow: hidden !important;
-      }
-      .grid-cols-12 {
-        display: grid !important;
-        grid-template-columns: repeat(12, minmax(0, 1fr)) !important;
-      }
-      #printArea {
-        grid-column: span 12 / span 12 !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
+        height: 80px !important; /* 印刷時は高さを80pxに固定して1ページに収める */
       }
     }
   `;
@@ -422,7 +430,7 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                左半分：入力フォーム（営業マン・社長操作用）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-4 p-5 space-y-4 bg-slate-50/50 text-xs no-print">
+          <div className="col-span-12 lg:col-span-4 p-5 space-y-4 bg-slate-50/50 text-xs no-print h-full lg:min-h-full">
             {/* シミュレーション見出しを大きく太く調整 */}
             <h2 className="text-sm font-extrabold text-[#0A1D37] border-b border-slate-350 pb-1.5 flex items-center gap-1.5 uppercase tracking-wide">
               ⚙️ 資金計画シミュレーション入力
@@ -594,7 +602,7 @@ export default function FinanceCalculatorClient({
               <label className="block text-[10px] font-bold text-slate-700">断熱性能プランの選択</label>
               <div className="grid grid-cols-3 gap-2">
                 <label
-                  className={`flex flex-col p-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition ${
+                  className={`flex flex-col justify-between items-center p-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[82px] ${
                     insulationPlan === 'none' ? 'border-[#0A1D37] ring-1 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -606,15 +614,15 @@ export default function FinanceCalculatorClient({
                     checked={insulationPlan === 'none'}
                     onChange={() => setInsulationPlan('none')}
                   />
-                  <span className="text-[10px] font-bold text-slate-700 block">未改修 (UA 1.5)</span>
-                  <span className="text-[8px] text-slate-400 mt-1">
+                  <span className="text-[10px] font-bold text-slate-700 block leading-tight">未改修 (UA 1.5)</span>
+                  <span className="text-[9px] text-slate-400 mt-1 leading-tight block">
                     エアコン代目安
                     <br />
                     1.6万円/月
                   </span>
                 </label>
                 <label
-                  className={`flex flex-col p-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition ${
+                  className={`flex flex-col justify-between items-center p-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[82px] ${
                     insulationPlan === 'standard' ? 'border-[#0A1D37] ring-1 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -626,15 +634,15 @@ export default function FinanceCalculatorClient({
                     checked={insulationPlan === 'standard'}
                     onChange={() => setInsulationPlan('standard')}
                   />
-                  <span className="text-[10px] font-bold text-slate-700 block">ZEH (UA 0.6)</span>
-                  <span className="text-[8px] text-[#A3B899] font-bold mt-1">
+                  <span className="text-[10px] font-bold text-slate-700 block leading-tight">ZEH (UA 0.6)</span>
+                  <span className="text-[9px] text-[#A3B899] font-bold mt-1 leading-tight block">
                     エアコン: 8千円/月
                     <br />
                     (月8千円削減)
                   </span>
                 </label>
                 <label
-                  className={`flex flex-col p-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition ${
+                  className={`flex flex-col justify-between items-center p-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[82px] ${
                     insulationPlan === 'premium' ? 'border-[#0A1D37] ring-1 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -646,8 +654,8 @@ export default function FinanceCalculatorClient({
                     checked={insulationPlan === 'premium'}
                     onChange={() => setInsulationPlan('premium')}
                   />
-                  <span className="text-[10px] font-bold text-[#0A1D37] block">G2プレミアム</span>
-                  <span className="text-[8px] text-[#C89D7C] font-bold mt-1">
+                  <span className="text-[10px] font-bold text-[#0A1D37] block leading-tight">G2プレミアム</span>
+                  <span className="text-[9px] text-[#C89D7C] font-bold mt-1 leading-tight block">
                     エアコン: 4千円/月
                     <br />
                     (月1.2万円節約)
@@ -707,7 +715,7 @@ export default function FinanceCalculatorClient({
               </label>
               <input
                 type="text"
-                className="w-full px-3 py-2 border border-slate-350 rounded-lg text-xs font-bold bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full pl-8 pr-3 py-2 border border-slate-350 rounded-lg text-xs font-bold bg-white text-slate-800 focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 value={propUrl}
                 onChange={e => setPropUrl(e.target.value)}
                 placeholder="物件URLを入力してください"
@@ -946,14 +954,14 @@ export default function FinanceCalculatorClient({
             </div>
 
             {/* 物件特徴とアドバイス (手動で編集可能) */}
-            <div className="space-y-1.5 border-t border-slate-100 pt-3 flex-grow flex flex-col justify-end mt-3">
+            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-4">
               <span className="text-[8px] md:text-[9px] font-bold text-slate-400 tracking-wider block uppercase">
                 📝 物件特徴とプロの融資審査向けアドバイス (画面上で編集・追記可能です)
               </span>
               <textarea
                 value={advisorComment}
                 onChange={e => setAdvisorComment(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[95px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[90px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 placeholder="アドバイスを記述してください..."
               />
               <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1">
