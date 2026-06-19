@@ -428,7 +428,7 @@ export default function FinanceCalculatorClient({
       </div>
 
       {/* A3横サイズを意識した横型大判カード（1400px設計・縦幅拡張版） */}
-      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[800px] h-fit">
+      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[750px] h-fit">
         {/* ヘッダー */}
         <div className="bg-[#0A1D37] text-white px-8 py-5 flex justify-between items-center border-b border-slate-800 flex-shrink-0">
           <div>
@@ -971,15 +971,15 @@ export default function FinanceCalculatorClient({
               </div>
             </div>
 
-            {/* 物件特徴とアドバイス (手動で編集可能) - 空白を埋めるために flex-grow と flex-col を適用 */}
-            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2 flex-grow flex flex-col justify-between">
+            {/* 物件特徴とアドバイス (手動で編集可能) */}
+            <div className="space-y-1.5 border-t border-slate-100 pt-3 mt-2 flex flex-col justify-between">
               <span className="text-[9px] md:text-[10px] font-bold text-slate-400 tracking-wider block uppercase">
                 📝 物件特徴とプロの融資審査向けアドバイス (画面上で編集・追記可能です)
               </span>
               <textarea
                 value={advisorComment}
                 onChange={e => setAdvisorComment(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none flex-grow min-h-[90px] h-auto focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[110px] min-h-[110px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 placeholder="アドバイスを記述してください..."
               />
               <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1">
