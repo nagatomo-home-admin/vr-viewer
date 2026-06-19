@@ -45,6 +45,7 @@ if %errorlevel% neq 0 (
 echo [4/4] Uploading to GitHub...
 git add .
 git commit -m "Auto sync: %date% %time%"
+git pull origin main --no-edit
 git push
 
 if %errorlevel% EQU 0 (
