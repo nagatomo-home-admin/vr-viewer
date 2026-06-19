@@ -1128,3 +1128,10 @@ h1, h2, h3, h4, h5, h6 {
   flex-direction: column;
   gap: 0.5rem;
 }
+
+/* 印刷時非表示用の共通ユーティリティクラス */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
