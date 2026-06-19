@@ -387,6 +387,11 @@ export default function FinanceCalculatorClient({
       .no-print {
         display: none !important;
       }
+      /* 印刷時は外側の親コンテナのパディングをゼロにする */
+      div.w-full.flex-1 {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
       .print-card {
         box-shadow: none !important;
         border: none !important;
@@ -394,7 +399,9 @@ export default function FinanceCalculatorClient({
         max-width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
-        height: auto !important;
+        height: 272mm !important; /* A3印刷可能縦幅(285mm)に余裕で収まる高さに厳密に固定 */
+        max-height: 272mm !important;
+        overflow: hidden !important; /* 2ページ目を絶対に発生させない */
       }
       /* 入力欄の背景や枠線を印刷向けにすっきりさせる */
       input, select, textarea {
@@ -424,7 +431,10 @@ export default function FinanceCalculatorClient({
         flex-basis: 100% !important;
         padding: 0 !important;
         margin: 0 !important;
-        height: auto !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important; /* 等間隔に美しく分散配置 */
+        height: 236mm !important; /* ヘッダー(18mm)とフッター(10mm)を引いた高さ */
       }
     }
   `;
