@@ -377,7 +377,7 @@ export default function FinanceCalculatorClient({
   `;
 
   return (
-    <div className="p-4 md:p-6 min-h-screen flex flex-col items-center justify-center bg-slate-100">
+    <div className="w-full flex-1 p-4 md:p-6 bg-slate-100 flex flex-col items-center justify-center">
       {/* 印刷用CSSの差し込み */}
       <style dangerouslySetInnerHTML={{ __html: printStyles }} />
 
@@ -430,7 +430,7 @@ export default function FinanceCalculatorClient({
           {/* ==========================================
                左半分：入力フォーム（営業マン・社長操作用）
                ========================================== */}
-          <div className="col-span-12 lg:col-span-4 p-6 space-y-6 bg-slate-50/50 text-sm no-print h-full lg:min-h-full border-r border-slate-200">
+          <div className="col-span-12 lg:col-span-4 p-6 space-y-8 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col">
             {/* シミュレーション見出しを大きく太く調整 */}
             <h2 className="text-lg font-extrabold text-[#0A1D37] border-b-2 border-[#0A1D37]/20 pb-2 flex items-center gap-1.5 uppercase tracking-wide">
               ⚙️ 資金計画シミュレーション入力
@@ -602,7 +602,7 @@ export default function FinanceCalculatorClient({
               <label className="block text-sm font-bold text-[#0A1D37]">断熱性能プランの選択</label>
               <div className="grid grid-cols-3 gap-2">
                 <label
-                  className={`flex flex-col justify-center items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1.5 ${
+                  className={`flex flex-col justify-center items-center py-3 px-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1 ${
                     insulationPlan === 'none' ? 'border-[#0A1D37] ring-2 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -615,14 +615,14 @@ export default function FinanceCalculatorClient({
                     onChange={() => setInsulationPlan('none')}
                   />
                   <span className="text-sm font-extrabold text-[#0A1D37] block leading-tight">未改修 (UA 1.5)</span>
-                  <span className="text-xs font-bold text-slate-500 leading-tight block">
+                  <span className="text-xs font-bold text-slate-600 leading-tight block">
                     エアコン代目安
                     <br />
                     1.6万円/月
                   </span>
                 </label>
                 <label
-                  className={`flex flex-col justify-center items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1.5 ${
+                  className={`flex flex-col justify-center items-center py-3 px-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1 ${
                     insulationPlan === 'standard' ? 'border-[#0A1D37] ring-2 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -635,14 +635,14 @@ export default function FinanceCalculatorClient({
                     onChange={() => setInsulationPlan('standard')}
                   />
                   <span className="text-sm font-extrabold text-[#0A1D37] block leading-tight">ZEH (UA 0.6)</span>
-                  <span className="text-xs font-bold text-[#A3B899] leading-tight block">
+                  <span className="text-xs font-bold text-emerald-700 leading-tight block">
                     エアコン: 8千円/月
                     <br />
                     (月8千円削減)
                   </span>
                 </label>
                 <label
-                  className={`flex flex-col justify-center items-center p-2.5 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1.5 ${
+                  className={`flex flex-col justify-center items-center py-3 px-2 border rounded-lg cursor-pointer text-center bg-white hover:bg-slate-50 transition min-h-[96px] gap-1 ${
                     insulationPlan === 'premium' ? 'border-[#0A1D37] ring-2 ring-[#0A1D37]' : 'border-slate-200'
                   }`}
                 >
@@ -655,7 +655,7 @@ export default function FinanceCalculatorClient({
                     onChange={() => setInsulationPlan('premium')}
                   />
                   <span className="text-sm font-extrabold text-[#0A1D37] block leading-tight">G2プレミアム</span>
-                  <span className="text-xs font-bold text-[#C89D7C] leading-tight block">
+                  <span className="text-xs font-bold text-amber-800 leading-tight block">
                     エアコン: 4千円/月
                     <br />
                     (月1.2万円節約)
