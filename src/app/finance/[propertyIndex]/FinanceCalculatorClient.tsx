@@ -370,11 +370,11 @@ export default function FinanceCalculatorClient({
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
-        height: 275mm !important; /* A3の縦幅に収めて1ページにする */
+        height: 268mm !important; /* 少し高さを抑えて確実に1ページに収める */
       }
       /* 要素間の縦余白を微調整 */
       .space-y-5 > * + * {
-        margin-top: 0.75rem !important;
+        margin-top: 0.5rem !important;
       }
       input, select, textarea {
         border: none !important;
@@ -386,7 +386,7 @@ export default function FinanceCalculatorClient({
       textarea {
         resize: none !important;
         overflow: hidden !important;
-        height: 80px !important; /* 印刷時は高さを80pxに固定して1ページに収める */
+        height: 70px !important; /* 印刷時は高さを70pxに固定して1ページに収める */
       }
     }
   `;
@@ -428,7 +428,7 @@ export default function FinanceCalculatorClient({
       </div>
 
       {/* A3横サイズを意識した横型大判カード（1400px設計・縦幅拡張版） */}
-      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[750px] h-fit">
+      <div className="w-full max-w-[1400px] bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden flex flex-col print-card min-h-[710px] h-fit">
         {/* ヘッダー */}
         <div className="bg-[#0A1D37] text-white px-8 py-5 flex justify-between items-center border-b border-slate-800 flex-shrink-0">
           <div>
@@ -446,7 +446,7 @@ export default function FinanceCalculatorClient({
                左半分：入力フォーム（営業マン・社長操作用）
                ========================================== */}
           <div
-            className="col-span-12 lg:col-span-4 p-6 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col"
+            className="col-span-12 lg:col-span-4 p-6 bg-slate-50/50 text-sm no-print border-r border-slate-200 flex flex-col h-full min-h-full"
             style={{ gap: '1rem' }}
           >
             {/* シミュレーション見出しを大きく太く調整 */}
@@ -979,7 +979,7 @@ export default function FinanceCalculatorClient({
               <textarea
                 value={advisorComment}
                 onChange={e => setAdvisorComment(e.target.value)}
-                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[110px] min-h-[110px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                className="w-full p-2.5 border border-slate-200 rounded-xl text-[9px] md:text-[10px] leading-relaxed text-slate-700 bg-slate-50/50 resize-none h-[95px] min-h-[95px] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
                 placeholder="アドバイスを記述してください..."
               />
               <div className="text-[7px] md:text-[8px] text-slate-400 leading-normal mt-1 border-t border-dashed border-slate-200 pt-1">
