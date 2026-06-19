@@ -6,7 +6,8 @@ import { usePathname } from 'next/navigation';
 
 /**
  * 長友スマート提案ボード ツール間相互移動メニュー（アコーディオン式）
- * 画面右上に追従し、資金計画、お住まい探し計画、プレゼンボード、図面比較をスムーズに行き来できます。
+ * 画面右下に追従し、資金計画、お住まい探し計画、プレゼンボード、図面比較をスムーズに行き来できます。
+ * 右上の操作ボタン群と被らないように画面右下に配置され、メニューは上方向に展開されます。
  * 印刷時（A3印刷プレビュー）にはno-printにより自動で完全に非表示になります。
  */
 export default function SmartBoardMenu() {
@@ -63,23 +64,10 @@ export default function SmartBoardMenu() {
   };
 
   return (
-    <div ref={menuRef} className="fixed top-4 right-4 z-50 no-print">
-      {/* メニュー開閉ボタン */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-4 py-2.5 bg-[#0A1D37] hover:bg-[#C89D7C] text-[#C89D7C] hover:text-[#0A1D37] border border-[#C89D7C] rounded-full shadow-lg transition-all duration-300 font-bold text-xs md:text-sm cursor-pointer"
-        aria-expanded={isOpen}
-      >
-        <span className="text-sm md:text-base">🛠️</span>
-        <span>スマート提案メニュー</span>
-        <span className={`text-[10px] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
-          ▼
-        </span>
-      </button>
-
-      {/* アコーディオン（展開されるドロップダウンカード） */}
+    <div ref={menuRef} className="fixed bottom-6 right-6 z-50 no-print">
+      {/* アコーディオン（展開されるドロップダウンカード・上方向に展開） */}
       {isOpen && (
-        <div className="absolute right-0 mt-3 w-80 bg-slate-900/95 backdrop-blur-md border border-[#C89D7C]/30 rounded-2xl shadow-2xl p-4 transition-all duration-300 animate-in fade-in slide-in-from-top-2">
+        <div className="absolute right-0 bottom-full mb-3 w-80 bg-slate-900/95 backdrop-blur-md border border-[#C89D7C]/30 rounded-2xl shadow-2xl p-4 transition-all duration-300 animate-in fade-in slide-in-from-bottom-2">
           <div className="border-b border-slate-800 pb-2 mb-3">
             <span className="text-[10px] font-bold text-[#C89D7C] tracking-widest uppercase block">
               Nagatomo Home DX Tool
@@ -127,6 +115,19 @@ export default function SmartBoardMenu() {
           </div>
         </div>
       )}
+
+      {/* メニュー開閉ボタン */}
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-4 py-2.5 bg-[#0A1D37] hover:bg-[#C89D7C] text-[#C89D7C] hover:text-[#0A1D37] border border-[#C89D7C] rounded-full shadow-lg transition-all duration-300 font-bold text-xs md:text-sm cursor-pointer"
+        aria-expanded={isOpen}
+      >
+        <span className="text-sm md:text-base">🛠️</span>
+        <span>スマート提案メニュー</span>
+        <span className={`text-[10px] transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`}>
+          ▲
+        </span>
+      </button>
     </div>
   );
 }
