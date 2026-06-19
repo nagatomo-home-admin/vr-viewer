@@ -18,6 +18,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "図面比較・変更点AI抽出",
   description: "AI（Gemini）を活用してリノベーション図面の変更点を自動抽出し、注釈を管理・書き出しするシステムです。",
+  manifest: "/manifest.json",
 };
 
 // ルートレイアウトコンポーネント
