@@ -53,6 +53,6 @@ export const config = {
      * - manifest.json / sw.js (PWA設定ファイル)
      * - 静的ファイル拡張子 (png, jpg, svg等)
      */
-    '/((?!api|_next/static|_next/image|favicon.ico|manifest\\.json|sw\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|manifest.*\\.json|sw\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 };
