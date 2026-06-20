@@ -997,12 +997,12 @@ export default function HearingPage() {
                     <label className="block text-slate-400 mb-1 font-bold text-[10px]">顧客ID（半角英数・保存用）</label>
                     <input 
                       type="text" 
-                      id="customer-id-input-field"
-                      name="customer-id-input-field"
+                      id="c-key-fld"
+                      name="c-key-fld"
                       placeholder="例: tateno"
                       value={data.customerId || ""}
                       onChange={(e) => handleInputChange("customerId", e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
-                      autoComplete="off"
+                      autoComplete="one-time-code"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#D9A05B] focus:ring-1 focus:ring-[#D9A05B]/30 transition"
                     />
                   </div>
@@ -1010,12 +1010,12 @@ export default function HearingPage() {
                     <label className="block text-slate-400 mb-1 font-bold text-[10px]">お客様お名前（苗字のみ）</label>
                     <input 
                       type="text" 
-                      id="customer-name-input-field"
-                      name="customer-name-input-field"
+                      id="c-val-fld"
+                      name="c-val-fld"
                       value={data.customerName}
                       onChange={(e) => handleInputChange("customerName", e.target.value)}
                       placeholder="例: 立野"
-                      autoComplete="off"
+                      autoComplete="one-time-code"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#D9A05B] focus:ring-1 focus:ring-[#D9A05B]/30 transition"
                     />
                   </div>
@@ -1023,12 +1023,12 @@ export default function HearingPage() {
                     <label className="block text-slate-400 mb-1 font-bold text-[10px]">担当者名</label>
                     <input 
                       type="text" 
-                      id="advisor-name-input-field"
-                      name="advisor-name-input-field"
+                      id="a-val-fld"
+                      name="a-val-fld"
                       value={data.advisorName}
                       onChange={(e) => handleInputChange("advisorName", e.target.value)}
                       placeholder="例: 長友"
-                      autoComplete="off"
+                      autoComplete="one-time-code"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#D9A05B] focus:ring-1 focus:ring-[#D9A05B]/30 transition"
                     />
                   </div>
