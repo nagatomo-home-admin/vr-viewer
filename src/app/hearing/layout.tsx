@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  manifest: "/manifest-hearing.json?v=5",
+  title: "お住まい探し計画書",
+  description: "対話型お住まい探し計画書・顧客要望ヒアリング",
+  manifest: "/manifest-hearing.json?v=6",
 };
 
 export default function HearingLayout({
