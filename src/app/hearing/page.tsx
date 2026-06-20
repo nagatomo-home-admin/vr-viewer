@@ -1821,11 +1821,11 @@ export default function HearingPage() {
                       <div className="space-y-1.5 text-xs font-bold text-gray-700 flex-grow flex flex-col justify-around">
                         <div className="flex justify-between">
                           <span className="text-gray-600">① 中古物件購入費用:</span>
-                          <span className="font-black text-[#0A192F]">${data.propertyPrice.toLocaleString()} 万円</span>
+                          <span className="font-black text-[#0A192F]">{data.propertyPrice.toLocaleString()} 万円</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">② 高性能フルリノベ費用:</span>
-                          <span className="font-black text-[#0A192F]">${data.renovePrice.toLocaleString()} 万円</span>
+                          <span className="font-black text-[#0A192F]">{data.renovePrice.toLocaleString()} 万円</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">③ 購入諸費用（概算）:</span>
