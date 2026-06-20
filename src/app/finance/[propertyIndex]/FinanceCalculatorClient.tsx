@@ -521,7 +521,7 @@ export default function FinanceCalculatorClient({
             </h2>
 
             {/* 物件設定 */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-3">
               <div>
                 <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">物件名</label>
                 <input
@@ -531,32 +531,34 @@ export default function FinanceCalculatorClient({
                   onChange={e => setPropName(e.target.value)}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">地銀ローン選択</label>
-                <select
-                  className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
-                  value={bankId}
-                  onChange={e => handleBankChange(e.target.value)}
-                >
-                  <option value="miya-bank">宮崎銀行（変動 0.975%）</option>
-                  <option value="miya-bank-fix">宮崎銀行（固定 2.850%）</option>
-                  <option value="taiyo-bank">宮崎太陽銀行（変動 1.075%）</option>
-                  <option value="kago-bank">鹿児島銀行（変動 1.350%）</option>
-                  <option value="kago-bank-fix">鹿児島銀行（固定 2.700%）</option>
-                  <option value="ja-bank">JA都城（変動 1.395%）</option>
-                  <option value="ja-bank-fix">JA都城（固定 2.300%）</option>
-                  <option value="flat35">フラット35（固定 1.900%）</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">顧客ID (保存用)</label>
-                <input
-                  type="text"
-                  className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
-                  value={customerId}
-                  onChange={e => setCustomerId(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
-                  placeholder="例: tanaka-reno"
-                />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">顧客ID (保存用)</label>
+                  <input
+                    type="text"
+                    className="w-full px-3 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    value={customerId}
+                    onChange={e => setCustomerId(e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
+                    placeholder="例: tanaka-reno"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-[#0A1D37] mb-1.5">地銀ローン選択</label>
+                  <select
+                    className="w-full px-2 py-2.5 border border-slate-300 rounded-lg text-sm font-bold bg-white text-[#0A1D37] focus:outline-none focus:ring-1 focus:ring-[#C89D7C]"
+                    value={bankId}
+                    onChange={e => handleBankChange(e.target.value)}
+                  >
+                    <option value="miya-bank">宮崎銀行（変動 0.975%）</option>
+                    <option value="miya-bank-fix">宮崎銀行（固定 2.850%）</option>
+                    <option value="taiyo-bank">宮崎太陽銀行（変動 1.075%）</option>
+                    <option value="kago-bank">鹿児島銀行（変動 1.350%）</option>
+                    <option value="kago-bank-fix">鹿児島銀行（固定 2.700%）</option>
+                    <option value="ja-bank">JA都城（変動 1.395%）</option>
+                    <option value="ja-bank-fix">JA都城（固定 2.300%）</option>
+                    <option value="flat35">フラット35（固定 1.900%）</option>
+                  </select>
+                </div>
               </div>
             </div>
 
