@@ -2,7 +2,7 @@
   "name": "長友スマート提案ボード",
   "short_name": "スマート提案",
   "description": "長友ホームのスマート提案ボード（図面比較・資金計画・お住まい探し計画）",
-  "start_url": "/",
+  "start_url": "/hearing",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
