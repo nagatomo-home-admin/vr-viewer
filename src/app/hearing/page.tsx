@@ -1619,7 +1619,6 @@ export default function HearingPage() {
                   <span className="bg-[#0A192F] text-white rounded px-3 py-1 text-sm font-black">01</span>
                   <h2 className="text-lg font-black text-[#0A192F] tracking-wide">ご要望の整理とご希望条件</h2>
                 </div>
-                <span className="text-xs text-gray-400 font-extrabold uppercase tracking-widest">Nagatomo Home</span>
               </div>
 
               {/* メインエリア */}
@@ -1763,7 +1762,6 @@ export default function HearingPage() {
                   <span className="bg-[#0A192F] text-white rounded px-3 py-1 text-sm font-black">02</span>
                   <h2 className="text-lg font-black text-[#0A192F] tracking-wide">賃貸比較 ＆ 資金計画シミュレーション</h2>
                 </div>
-                <span className="text-xs text-gray-400 font-extrabold uppercase tracking-widest">Nagatomo Home</span>
               </div>
 
               {/* メインエリア */}

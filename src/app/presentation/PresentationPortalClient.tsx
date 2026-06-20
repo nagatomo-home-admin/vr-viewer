@@ -1400,9 +1400,23 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
       `}</style>
 
       <header className="portal-header">
-        <div className="portal-title-area">
-          <h1>長友ホーム AI提案ボードポータル</h1>
-          <p>お施主様別のデジタルプレゼンボード（A3印刷対応）を一元管理します</p>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{
+            border: "1px solid #e2b83b",
+            borderRadius: "4px",
+            width: "32px",
+            height: "32px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            fontWeight: "900",
+            color: "#e2b83b",
+            flexShrink: 0
+          }}>N</div>
+          <div className="portal-title-area">
+            <h1>長友ホーム AI提案ボードポータル</h1>
+            <p>お施主様別のデジタルプレゼンボード（A3印刷対応）を一元管理します</p>
+          </div>
         </div>
         <div style={{ display: "flex", gap: "1rem" }}>
           <Link href="/hearing" style={{ textDecoration: "none" }}>

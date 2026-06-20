@@ -232,13 +232,16 @@ export default function FinancePortalClient({ initialProperties, customerIds }: 
       {/* ヘッダー */}
       <header className="bg-[#0A1D37] text-white py-6 shadow-lg flex-shrink-0 border-b border-[#C89D7C]/20">
         <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center w-full gap-4">
-          <div>
-            <span className="text-[#C89D7C] text-xs font-bold tracking-widest uppercase block">
-              Nagatomo Home AI Strategy Office
-            </span>
-            <h1 className="text-2xl font-bold mt-1 tracking-tight">
-              マイホーム資金計画提案書 ポータル
-            </h1>
+          <div className="flex items-center gap-3">
+            <div className="border border-[#C89D7C] rounded w-8 h-8 flex items-center justify-center font-black text-[#C89D7C] flex-shrink-0">N</div>
+            <div>
+              <span className="text-[#C89D7C] text-xs font-bold tracking-widest uppercase block">
+                Nagatomo Home AI Strategy Office
+              </span>
+              <h1 className="text-2xl font-bold mt-1 tracking-tight">
+                マイホーム資金計画提案書 ポータル
+              </h1>
+            </div>
           </div>
           <div className="text-right text-xs text-slate-400">
             <p className="bg-[#0A1D37]/50 border border-slate-700/50 px-4 py-1.5 rounded-full text-[#C89D7C] font-bold shadow-inner">
