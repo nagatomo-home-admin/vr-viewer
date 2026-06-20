@@ -2,7 +2,7 @@
   "name": "図面比較・変更点AI抽出 & 資金計画ボード",
   "short_name": "長友スマート提案",
   "description": "AIを活用したリノベーション図面の比較・変更点抽出と資金計画提案システム",
-  "start_url": "/",
+  "start_url": "/hearing",
   "display": "standalone",
   "background_color": "#0A1D37",
   "theme_color": "#0A1D37",
