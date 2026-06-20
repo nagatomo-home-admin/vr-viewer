@@ -8,7 +8,7 @@ import PresentationPortalClient from "./PresentationPortalClient";
 export default function PresentationPage() {
   const dirPath = path.join(process.cwd(), "src", "data", "presentation");
   
-  let clientList: Array<{ id: string; clientName: string; planName: string; fullData?: any }> = [];
+  let clientList: Array<{ id: string; clientName: string; planName: string; updatedAt?: number; fullData?: any }> = [];
 
   try {
     if (fs.existsSync(dirPath)) {
@@ -17,6 +17,7 @@ export default function PresentationPage() {
         if (file.endsWith(".json")) {
           const id = file.replace(".json", "");
           const filePath = path.join(dirPath, file);
+          const stat = fs.statSync(filePath);
           const fileContent = fs.readFileSync(filePath, "utf8");
           try {
             const data = JSON.parse(fileContent);
@@ -24,6 +25,7 @@ export default function PresentationPage() {
               id,
               clientName: data.clientName ? data.clientName.replace("様邸", "").replace("様", "") : "未設定",
               planName: data.planName || "提案プラン",
+              updatedAt: stat.mtimeMs,
               fullData: data
             });
           } catch (jsonErr) {

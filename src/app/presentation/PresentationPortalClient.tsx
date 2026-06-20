@@ -101,12 +101,48 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface PortalClientProps {
-  initialList: Array<{ id: string; clientName: string; planName: string; fullData?: any }>;
+  initialList: Array<{ id: string; clientName: string; planName: string; updatedAt?: number; fullData?: any }>;
 }
 
 export default function PresentationPortalClient({ initialList }: PortalClientProps) {
   const router = useRouter();
   const [list, setList] = useState(initialList);
+  const [sortKey, setSortKey] = useState<'index' | 'name' | 'id' | 'update'>('index');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  const getFilteredAndSortedList = () => {
+    const filtered = list.filter(client => 
+      client.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      client.planName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    
+    return [...filtered].sort((a, b) => {
+      let valA: any;
+      let valB: any;
+      
+      if (sortKey === 'index') {
+        valA = initialList.indexOf(a);
+        valB = initialList.indexOf(b);
+      } else if (sortKey === 'name') {
+        valA = a.clientName;
+        valB = b.clientName;
+        const res = valA.localeCompare(valB, 'ja');
+        return sortOrder === 'asc' ? res : -res;
+      } else if (sortKey === 'id') {
+        valA = a.id;
+        valB = b.id;
+      } else if (sortKey === 'update') {
+        valA = a.updatedAt || 0;
+        valB = b.updatedAt || 0;
+      }
+      
+      if (valA < valB) return sortOrder === 'asc' ? -1 : 1;
+      if (valA > valB) return sortOrder === 'asc' ? 1 : -1;
+      return 0;
+    });
+  };
+
   // 動的パターンのステート
   const [doorTypes, setDoorTypes] = useState<any>(defaultDoorTypes);
   const [plans, setPlans] = useState<any>(defaultPlans);
@@ -1079,13 +1115,34 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
       <style>{`
         .portal-container {
           min-height: 100vh;
+          font-family: 'Inter', sans-serif;
+          background: #f8fafc;
+          color: #0f172a;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+        }
+
+        .portal-top-section {
           background: linear-gradient(135deg, #070a13 0%, #111827 100%);
           color: #f8fafc;
-          font-family: 'Inter', sans-serif;
+          padding: 3rem 2rem 2rem 2rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          width: 100%;
+          box-sizing: border-box;
+        }
+
+        .portal-bottom-section {
+          background: #f8fafc;
           padding: 3rem 2rem;
           display: flex;
           flex-direction: column;
           align-items: center;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .portal-header {
@@ -1399,47 +1456,40 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
         }
       `}</style>
 
-      <header className="portal-header">
-        <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-          <div style={{
-            border: "1px solid #e2b83b",
-            borderRadius: "4px",
-            width: "32px",
-            height: "32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontWeight: "900",
-            color: "#e2b83b",
-            flexShrink: 0
-          }}>N</div>
-          <div className="portal-title-area">
-            <h1>長友ホーム AI提案ボードポータル</h1>
-            <p>お施主様別のデジタルプレゼンボード（A3印刷対応）を一元管理します</p>
+      <div className="portal-top-section">
+        <header className="portal-header">
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{
+              border: "1px solid #e2b83b",
+              borderRadius: "4px",
+              width: "32px",
+              height: "32px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontWeight: "900",
+              color: "#e2b83b",
+              flexShrink: 0
+            }}>N</div>
+            <div className="portal-title-area">
+              <h1 style={{ color: "#f8fafc" }}>長友ホーム AI提案ボードポータル</h1>
+              <p style={{ color: "#94a3b8" }}>お施主様別のデジタルプレゼンボード（A3印刷対応）を一元管理します</p>
+            </div>
           </div>
-        </div>
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <Link href="/hearing" style={{ textDecoration: "none" }}>
+          <div style={{ display: "flex", gap: "1rem" }}>
             <button 
               className="btn-create-toggle"
+              onClick={handleNewPlanClick}
               style={{
-                background: "transparent",
-                color: "#e2b83b",
-                border: "1px solid #e2b83b",
-                boxShadow: "none"
+                background: "linear-gradient(135deg, #e2b83b 0%, #c69b6b 100%)",
+                color: "#070a13",
+                boxShadow: "0 4px 12px rgba(226, 184, 59, 0.2)"
               }}
             >
-              💬 スマート提案ボードへ
+              {showForm ? "✖ 閉じる" : "➕ 新規プランを作成"}
             </button>
-          </Link>
-          <button 
-            className="btn-create-toggle"
-            onClick={handleNewPlanClick}
-          >
-            {showForm ? "✖ 閉じる" : "➕ 新規プランを作成"}
-          </button>
-        </div>
-      </header>
+          </div>
+        </header>
 
       <main className="portal-main">
         {errorMsg && <div className="error-banner">{errorMsg}</div>}
@@ -1736,95 +1786,140 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
             </div>
           </form>
         )}
+      </main>
+    </div>
 
-        <section className="client-list-section">
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem", flexWrap: "wrap", gap: "1rem" }}>
-            <h2>📁 登録されているお施主様プラン一覧</h2>
-            <div style={{ position: "relative", width: "100%", maxWidth: "350px" }}>
+    <div className="portal-bottom-section">
+      <section className="client-list-section">
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem", flexWrap: "wrap", gap: "1.5rem" }}>
+          <h2>📁 登録されているお施主様プラン一覧</h2>
+          
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center", flexWrap: "wrap" }}>
+            {/* 並び替えセレクトボックス */}
+            <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+              <span style={{ fontSize: "0.85rem", fontWeight: "600", color: "#475569" }}>並び替え:</span>
+              <select
+                value={sortKey}
+                onChange={(e: any) => setSortKey(e.target.value)}
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #cbd5e1",
+                  padding: "0.5rem 1.75rem 0.5rem 0.75rem",
+                  borderRadius: "6px",
+                  color: "#0f172a",
+                  fontSize: "0.85rem",
+                  fontWeight: "600",
+                  outline: "none",
+                  cursor: "pointer"
+                }}
+              >
+                <option value="index">登録順</option>
+                <option value="name">お名前順</option>
+                <option value="id">顧客ID順</option>
+                <option value="update">更新順</option>
+              </select>
+              <button
+                type="button"
+                onClick={() => setSortOrder(prev => prev === 'asc' ? 'desc' : 'asc')}
+                style={{
+                  background: "#ffffff",
+                  border: "1px solid #cbd5e1",
+                  padding: "0.5rem 0.75rem",
+                  borderRadius: "6px",
+                  color: "#0f172a",
+                  fontSize: "0.85rem",
+                  fontWeight: "600",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.25rem",
+                  transition: "all 0.2s"
+                }}
+              >
+                {sortOrder === 'asc' ? '昇順 ⬆️' : '降順 ⬇️'}
+              </button>
+            </div>
+
+            {/* 検索バー */}
+            <div style={{ position: "relative", width: "250px" }}>
               <input 
                 type="text" 
-                placeholder="🔍 顧客ID、お名前、プラン名で検索..."
+                placeholder="🔍 検索..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 style={{
                   width: "100%",
-                  background: "rgba(7, 10, 19, 0.8)",
-                  border: "1px solid rgba(255, 255, 255, 0.15)",
-                  padding: "0.65rem 1rem 0.65rem 2.5rem",
+                  background: "#ffffff",
+                  border: "1px solid #cbd5e1",
+                  padding: "0.5rem 1rem 0.5rem 2.2rem",
                   borderRadius: "30px",
-                  color: "#f8fafc",
+                  color: "#0f172a",
                   fontSize: "0.85rem",
                   outline: "none",
                   transition: "all 0.2s"
                 }}
               />
-              <span style={{ position: "absolute", left: "0.9rem", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none", fontSize: "0.9rem" }}>
+              <span style={{ position: "absolute", left: "0.75rem", top: "50%", transform: "translateY(-50%)", color: "#64748b", pointerEvents: "none", fontSize: "0.85rem" }}>
                 🔍
               </span>
             </div>
           </div>
-          <div className="client-grid">
-            {list.filter(client => 
-              client.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              client.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-              client.planName.toLowerCase().includes(searchQuery.toLowerCase())
-            ).length > 0 ? (
-              list.filter(client => 
-                client.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                client.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                client.planName.toLowerCase().includes(searchQuery.toLowerCase())
-              ).map((client) => (
-                <a 
-                  href={`/presentation/${client.id}`}
-                  className="client-card" 
-                  key={client.id}
-                  style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative", textDecoration: "none", color: "inherit" }}
-                >
-                  <div>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%" }}>
-                      <span className="card-meta">ID: {client.id}</span>
-                      {/* 操作アクションボタン */}
-                      <div style={{ display: "flex", gap: "0.35rem", zIndex: 10 }}>
-                        <button 
-                          title="編集" 
-                          onClick={(e) => { e.preventDefault(); handleEditClick(e, client); }} 
-                          className="card-action-btn"
-                          style={{ background: "rgba(226, 184, 59, 0.15)", color: "#e2b83b" }}
-                        >
-                          ✏️
-                        </button>
-                        <button 
-                          title="複製" 
-                          onClick={(e) => { e.preventDefault(); handleDuplicateClick(e, client); }} 
-                          className="card-action-btn"
-                          style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e" }}
-                        >
-                          🗂️
-                        </button>
-                        <button 
-                          title="削除" 
-                          onClick={(e) => { e.preventDefault(); handleDeleteClick(e, client.id, client.clientName); }} 
-                          className="card-action-btn"
-                          style={{ background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5" }}
-                        >
-                          🗑️
-                        </button>
-                      </div>
+        </div>
+
+        <div className="client-grid">
+          {getFilteredAndSortedList().length > 0 ? (
+            getFilteredAndSortedList().map((client) => (
+              <a 
+                href={`/presentation/${client.id}`}
+                className="client-card" 
+                key={client.id}
+                style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", position: "relative", textDecoration: "none", color: "inherit" }}
+              >
+                <div>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", width: "100%" }}>
+                    <span className="card-meta">ID: {client.id}</span>
+                    {/* 操作アクションボタン */}
+                    <div style={{ display: "flex", gap: "0.35rem", zIndex: 10 }}>
+                      <button 
+                        title="編集" 
+                        onClick={(e) => { e.preventDefault(); handleEditClick(e, client); }} 
+                        className="card-action-btn"
+                        style={{ background: "rgba(226, 184, 59, 0.15)", color: "#e2b83b" }}
+                      >
+                        ✏️
+                      </button>
+                      <button 
+                        title="複製" 
+                        onClick={(e) => { e.preventDefault(); handleDuplicateClick(e, client); }} 
+                        className="card-action-btn"
+                        style={{ background: "rgba(34, 197, 94, 0.15)", color: "#22c55e" }}
+                      >
+                        🗂️
+                      </button>
+                      <button 
+                        title="削除" 
+                        onClick={(e) => { e.preventDefault(); handleDeleteClick(e, client.id, client.clientName); }} 
+                        className="card-action-btn"
+                        style={{ background: "rgba(239, 68, 68, 0.15)", color: "#fca5a5" }}
+                      >
+                        🗑️
+                      </button>
                     </div>
-                    <h3 className="card-name" style={{ marginTop: "0.5rem" }}>{client.clientName}様</h3>
-                    <p className="card-plan">{client.planName}</p>
                   </div>
-                  <div className="card-arrow">提案ボードを開く ➔</div>
-                </a>
-              ))
-            ) : (
-              <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "4rem 2rem", background: "rgba(17, 24, 39, 0.4)", borderRadius: "16px", border: "1px dashed rgba(255,255,255,0.08)", color: "#94a3b8" }}>
-                該当するお施主様プランが見つかりませんでした。
-              </div>
-            )}
-          </div>
-        </section>
-      </main>
+                  <h3 className="card-name" style={{ marginTop: "0.5rem" }}>{client.clientName}様</h3>
+                  <p className="card-plan">{client.planName}</p>
+                </div>
+                <div className="card-arrow">提案ボードを開く ➔</div>
+              </a>
+            ))
+          ) : (
+            <div style={{ gridColumn: "1 / -1", textAlign: "center", padding: "4rem 2rem", background: "#ffffff", borderRadius: "16px", border: "1px dashed #cbd5e1", color: "#64748b" }}>
+              該当するお施主様プランが見つかりませんでした。
+            </div>
+          )}
+        </div>
+      </section>
+    </div>
     </div>
   );
 }
