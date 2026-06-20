@@ -3,6 +3,7 @@
   "short_name": "お住まい探し計画",
   "description": "対話型の顧客要望ヒアリング・整理と資金計画シミュレーション",
   "start_url": "/hearing",
+  "scope": "/hearing",
   "display": "standalone",
   "orientation": "any",
   "icons": [
