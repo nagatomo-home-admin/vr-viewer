@@ -1213,7 +1213,7 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
           font-size: 1.2rem;
           font-weight: 700;
           margin-bottom: 1.5rem;
-          color: #e2b83b;
+          color: #0f172a;
           display: flex;
           align-items: center;
           gap: 0.5rem;
@@ -1226,8 +1226,8 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
         }
 
         .client-card {
-          background: rgba(17, 24, 39, 0.6);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: #111827;
+          border: 1px solid #1f2937;
           border-radius: 12px;
           padding: 1.5rem;
           display: flex;
@@ -1236,19 +1236,19 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
           transition: all 0.25s ease;
           cursor: pointer;
           text-decoration: none;
-          color: inherit;
+          color: #f8fafc;
         }
 
         .client-card:hover {
           transform: translateY(-3px);
           border-color: #e2b83b;
-          background: rgba(17, 24, 39, 0.8);
-          box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+          background: #1f2937;
+          box-shadow: 0 10px 20px rgba(0,0,0,0.15);
         }
 
         .card-meta {
           font-size: 0.75rem;
-          color: #64748b;
+          color: #cbd5e1;
           font-weight: 600;
           text-transform: uppercase;
         }
@@ -1256,13 +1256,13 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
         .card-name {
           font-size: 1.25rem;
           font-weight: 700;
-          color: #f8fafc;
+          color: #ffffff;
           margin: 0.5rem 0;
         }
 
         .card-plan {
           font-size: 0.85rem;
-          color: #94a3b8;
+          color: #e2e8f0;
           line-height: 1.4;
           flex: 1;
         }
