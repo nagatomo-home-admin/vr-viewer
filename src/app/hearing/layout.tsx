@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  manifest: "/manifest-hearing.json",
+  manifest: "/manifest-hearing.json?v=3",
 };
 
 export default function HearingLayout({
