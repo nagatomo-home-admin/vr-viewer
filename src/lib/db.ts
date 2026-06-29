@@ -5,8 +5,8 @@ import path from 'path';
 let kv: any = null;
 try {
   // 環境変数を確認し、値が存在する場合のみVercel KVを読み込みます (STORAGE_ プレフィックス付きもサポート)
-  const kvUrl = process.env.KV_REST_API_URL || process.env.STORAGE_KV_REST_API_URL;
-  const kvToken = process.env.KV_REST_API_TOKEN || process.env.STORAGE_KV_REST_API_TOKEN;
+  const kvUrl = process.env.KV_REST_API_URL || process.env.STORAGE_REST_API_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN || process.env.STORAGE_REST_API_TOKEN;
 
   if (kvUrl && kvToken) {
     // 連携ライブラリが内部で参照する標準環境変数名に値をコピーしてセットします
