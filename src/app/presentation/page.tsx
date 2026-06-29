@@ -1,41 +1,29 @@
 export const dynamic = "force-dynamic";
 
-import fs from "fs";
-import path from "path";
+import { getPresentationList, getPresentationData } from "@/lib/db";
 import PresentationPortalClient from "./PresentationPortalClient";
 
-// サーバーサイドで登録されているJSONデータを全スキャンし、管理ポータル画面へ表示
-export default function PresentationPage() {
-  const dirPath = path.join(process.cwd(), "src", "data", "presentation");
+// サーバーサイドで登録されているJSONデータを全スキャンし、管理ポータル画面へ表示 (Vercel KV または ローカル)
+export default async function PresentationPage() {
+  const customerIds = await getPresentationList();
   
   let clientList: Array<{ id: string; clientName: string; planName: string; updatedAt?: number; fullData?: any }> = [];
 
-  try {
-    if (fs.existsSync(dirPath)) {
-      const files = fs.readdirSync(dirPath);
-      files.forEach((file) => {
-        if (file.endsWith(".json")) {
-          const id = file.replace(".json", "");
-          const filePath = path.join(dirPath, file);
-          const stat = fs.statSync(filePath);
-          const fileContent = fs.readFileSync(filePath, "utf8");
-          try {
-            const data = JSON.parse(fileContent);
-            clientList.push({
-              id,
-              clientName: data.clientName ? data.clientName.replace("様邸", "").replace("様", "") : "未設定",
-              planName: data.planName || "提案プラン",
-              updatedAt: stat.mtimeMs,
-              fullData: data
-            });
-          } catch (jsonErr) {
-            console.error(`Failed to parse json: ${file}`, jsonErr);
-          }
-        }
-      });
+  for (const id of customerIds) {
+    try {
+      const data = await getPresentationData(id);
+      if (data) {
+        clientList.push({
+          id,
+          clientName: data.clientName ? data.clientName.replace("様邸", "").replace("様", "") : "未設定",
+          planName: data.planName || "提案プラン",
+          updatedAt: Date.now(), // 簡易的に現在時刻（またはデータ内の更新フラグ等）を設定
+          fullData: data
+        });
+      }
+    } catch (err) {
+      console.error(`Failed to load client data for portal: ${id}`, err);
     }
-  } catch (error) {
-    console.error("Failed to read presentation data directory:", error);
   }
 
   // 顧客リストが空の場合のフォールバック
