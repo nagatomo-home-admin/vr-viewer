@@ -781,6 +781,13 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
             level: "等級7 (世界最高クラス断熱)",
             description: "世界トップクラスの断熱性能を誇るトリプルガラスサッシ。\n熱損失をほぼ完全にシャットアウトし、冬の底冷えを劇的に解消します。",
             apwSpecImage: "/catalog/APW430/トリプルガラスの断面構造図.jpg"
+          },
+          madoremo: {
+            name: "かんたんマドリモ (リフォーム窓)",
+            ua: "0.46",
+            level: "等級6相当 (カバー工法・樹脂Low-E複層窓)",
+            description: "今ある窓枠の上から新しい樹脂窓をかぶせるカバー工法。\n壁を壊さずスピーディに、住まいの断熱性能を劇的に向上させます。",
+            apwSpecImage: "/catalog/マドリモ/マドリモ_上部.png"
           }
         },
         doorTypes: (() => {
