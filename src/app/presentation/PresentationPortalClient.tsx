@@ -814,6 +814,18 @@ export default function PresentationPortalClient({ initialList }: PortalClientPr
       },
       interiorSpec: {
         title: "🚪 長友ホーム標準建具：Smayell（スマエル）",
+        floorTypes: {
+          standard: {
+            name: "ikuta 銘木フロアー\nラスティック ナラ樫",
+            description: "天然木ならではの豊かな表情と温かみを持ち、\nラスティック塗装により傷や汚れに強い\n高品質な複合フローリング。",
+            image: "/catalog/floor/ikuta_floor.jpg"
+          },
+          premium: {
+            name: "チャネルオリジナル\nユニシリーズ オーク（カントリー）",
+            description: "オーク無垢材ならではの豊かな節や\n経年変化が楽しめる、足ざわりが極めて\n心地よい本物の無垢フローリング。",
+            image: "/catalog/floor/channel_floor.jpg"
+          }
+        },
         plans: (() => {
           const updated = { ...plans };
           // natural / luxury などのプランの床材・カラーチップをフォームの入力値でマージ
