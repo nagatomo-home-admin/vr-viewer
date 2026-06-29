@@ -251,3 +251,131 @@ export async function deleteHearingData(customerId: string): Promise<boolean> {
   return false;
 }
 
+// プレゼンデータ用フォルダのパスを設定
+const LOCAL_PRESENTATION_DIR = path.join(process.cwd(), 'src', 'data', 'presentation');
+
+/**
+ * 顧客のプレゼンデータ（提案ボード）を取得します (Vercel KV または ローカル)
+ */
+export async function getPresentationData(customerId: string): Promise<any | null> {
+  if (kv) {
+    try {
+      const data = await kv.get(`presentation:${customerId}`);
+      if (data) {
+        return typeof data === 'string' ? JSON.parse(data) : data;
+      }
+    } catch (e) {
+      console.error(`Vercel KVからのプレゼンデータ(${customerId})取得に失敗しました。ローカルファイルにフォールバックします:`, e);
+    }
+  }
+
+  try {
+    const filePath = path.join(LOCAL_PRESENTATION_DIR, `${customerId}.json`);
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, 'utf8');
+      return JSON.parse(content);
+    }
+  } catch (e) {
+    console.error("ローカルプレゼンデータの読み込みエラー:", e);
+  }
+  return null;
+}
+
+/**
+ * 顧客のプレゼンデータ（提案ボード）を保存します (Vercel KV または ローカル)
+ */
+export async function savePresentationData(customerId: string, clientName: string, data: any): Promise<boolean> {
+  if (kv) {
+    try {
+      // 1. 各個別顧客データを保存
+      await kv.set(`presentation:${customerId}`, data);
+      
+      // 2. 顧客IDリストの更新
+      const list = await getPresentationList();
+      const updatedList = list.filter((c: string) => c !== customerId);
+      updatedList.unshift(customerId);
+      await kv.set('presentation_list', updatedList);
+      
+      console.log(`Vercel KVへプレゼンデータ(${customerId})を保存しました`);
+      return true;
+    } catch (e) {
+      console.error(`Vercel KVへのプレゼンデータ(${customerId})保存に失敗しました。ローカルファイルへの書き込みを行います:`, e);
+    }
+  }
+
+  try {
+    if (!fs.existsSync(LOCAL_PRESENTATION_DIR)) {
+      fs.mkdirSync(LOCAL_PRESENTATION_DIR, { recursive: true });
+    }
+    const filePath = path.join(LOCAL_PRESENTATION_DIR, `${customerId}.json`);
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), 'utf8');
+    console.log(`ローカルJSONファイルへプレゼンデータ(${customerId})を保存しました`);
+    return true;
+  } catch (e) {
+    console.error("ローカルプレゼンデータの保存エラー:", e);
+    return false;
+  }
+}
+
+/**
+ * 顧客のプレゼンデータ一覧を取得します
+ */
+export async function getPresentationList(): Promise<string[]> {
+  if (kv) {
+    try {
+      const data = await kv.get('presentation_list');
+      if (data) {
+        return typeof data === 'string' ? JSON.parse(data) : (Array.isArray(data) ? data : []);
+      }
+    } catch (e) {
+      console.error("Vercel KVからのプレゼン顧客IDリスト取得に失敗しました。ローカルディレクトリ走査にフォールバックします:", e);
+    }
+  }
+
+  try {
+    if (fs.existsSync(LOCAL_PRESENTATION_DIR)) {
+      const files = fs.readdirSync(LOCAL_PRESENTATION_DIR);
+      return files
+        .filter(file => file.endsWith('.json') && file !== 'default.json')
+        .map(file => file.replace('.json', ''));
+    }
+  } catch (e) {
+    console.error("ローカルプレゼンリストの走査エラー:", e);
+  }
+  return [];
+}
+
+/**
+ * 顧客のプレゼンデータ（提案ボード）を削除します
+ */
+export async function deletePresentationData(customerId: string): Promise<boolean> {
+  if (kv) {
+    try {
+      // 1. 各個別顧客データを削除
+      await kv.del(`presentation:${customerId}`);
+      
+      // 2. 顧客IDリストから削除
+      const list = await getPresentationList();
+      const updatedList = list.filter((c: string) => c !== customerId);
+      await kv.set('presentation_list', updatedList);
+      
+      console.log(`Vercel KVからプレゼンデータ(${customerId})を削除しました`);
+      return true;
+    } catch (e) {
+      console.error(`Vercel KVからのプレゼンデータ(${customerId})削除に失敗しました。ローカルファイルの削除を行います:`, e);
+    }
+  }
+
+  try {
+    const filePath = path.join(LOCAL_PRESENTATION_DIR, `${customerId}.json`);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+      console.log(`ローカルJSONファイルからプレゼンデータ(${customerId})を削除しました`);
+      return true;
+    }
+  } catch (e) {
+    console.error("ローカルプレゼンデータの削除エラー:", e);
+  }
+  return false;
+}
+

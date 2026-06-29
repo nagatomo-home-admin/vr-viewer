@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { savePresentationData } from "@/lib/db";
 
-// フォームから送信された顧客データをJSONファイルとしてサーバー側に保存するAPI
+// フォームから送信された顧客データをサーバー側に保存するAPI (Vercel KV または ローカル)
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -25,18 +24,14 @@ export async function POST(request: Request) {
       );
     }
 
-    // 保存ディレクトリの決定
-    const dirPath = path.join(process.cwd(), "src", "data", "presentation");
+    const clientName = data.clientName || safeCustomerId;
     
-    // ディレクトリが存在しない場合は自動作成
-    if (!fs.existsSync(dirPath)) {
-      fs.mkdirSync(dirPath, { recursive: true });
-    }
+    // データベース抽象化層を通じて保存を実行
+    const success = await savePresentationData(safeCustomerId, clientName, data);
 
-    const filePath = path.join(dirPath, `${safeCustomerId}.json`);
-    
-    // JSONファイルとして書き込み (整形して保存)
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
+    if (!success) {
+      throw new Error("Failed to write presentation data to storage.");
+    }
 
     return NextResponse.json({ success: true, customerId: safeCustomerId });
   } catch (error) {
