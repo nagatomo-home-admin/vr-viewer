@@ -4,8 +4,15 @@ import path from 'path';
 // Vercel KVを動的にインポートするための変数定義
 let kv: any = null;
 try {
-  // 環境変数を確認し、値が存在する場合のみVercel KVを読み込みます
-  if (process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN) {
+  // 環境変数を確認し、値が存在する場合のみVercel KVを読み込みます (STORAGE_ プレフィックス付きもサポート)
+  const kvUrl = process.env.KV_REST_API_URL || process.env.STORAGE_KV_REST_API_URL;
+  const kvToken = process.env.KV_REST_API_TOKEN || process.env.STORAGE_KV_REST_API_TOKEN;
+
+  if (kvUrl && kvToken) {
+    // 連携ライブラリが内部で参照する標準環境変数名に値をコピーしてセットします
+    if (!process.env.KV_REST_API_URL) process.env.KV_REST_API_URL = kvUrl;
+    if (!process.env.KV_REST_API_TOKEN) process.env.KV_REST_API_TOKEN = kvToken;
+
     // 実行時エラーを防ぐため、requireで動的読み込みを行います
     const vercelKv = require('@vercel/kv');
     kv = vercelKv.kv;
