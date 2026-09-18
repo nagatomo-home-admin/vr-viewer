@@ -2100,7 +2100,7 @@
 
             <!-- 連動して表示される破風・軒天詳細プルダウン -->
             <div class="input-group slide-down" id="eavesSelectorGroup">
-                <label for="exteriorEaves">③ 軒天・破風・鼻隠し (Soffits & Fascias Accent)</label>
+                <label for="exteriorEaves">🏠 軒天・破風・鼻隠し (Soffits & Fascias Accent)</label>
                 <div class="select-wrapper">
                     <select id="exteriorEaves" onchange="generatePrompt()">
                         <option value="accent matte black roof soffits and fascia boards" data-desc="【一番人気】軒裏と破風・鼻隠しを全てシックな艶消し黒で統一し、シャープな輪郭を作ります。">黒の軒天 ＆ 黒の破風・鼻隠し (Matte Black)</option>
@@ -2550,7 +2550,7 @@
 
             <!-- 観葉植物の量 -->
             <div class="input-group">
-                <label for="panoramaGreeneryLevel">🌿 観葉植物 of 量 (Greenery Level)</label>
+                <label for="panoramaGreeneryLevel">🌿 観葉植物の量 (Greenery Level)</label>
                 <div class="select-wrapper">
                     <select id="panoramaGreeneryLevel" onchange="generatePrompt()">
                         <option value="none" data-desc="【なし】観葉植物を一切置かず、建物の構造や美しいライン、木目の表情をスッキリ際立たせます。">なし (None)</option>
@@ -2725,7 +2725,7 @@
                 { name: "【間接照明なし】シンプルな天井照明 (No Indirect Lights)", value: "no indirect lighting, clean visible ceiling light fixtures neatly installed, basic residential illumination, standard ceiling setup with zero hidden lights", desc: "【標準・ローコスト仕様】間接照明（コーブやライン照明）を一切使わず、すっきりとした天井シーリングやシンプルな一般照明器具だけに限定します。" }
             ],
             interiorStyle: [
-                { name: "王道ナチュラル (Natural Cafe)", value: "light oak floor, white oak wood, natural linen curtains, woven rattan dining chairs, a few green indoor plants, cozy and warm organic textures", desc: "明るいオーク材、ラタン、リネンを使用。観葉植物は一鉢に限定しジャングル化を防止。" },
+                { name: "王道ナチュラル (Natural Cafe)", value: "light oak floor, white oak wood, natural linen curtains, woven rattan dining chairs, cozy and warm organic textures", desc: "明るいオーク材、ラタン、リネンを使用。観葉植物の量は設定プルダウンから自在に調整可能。" },
                 { name: "都会的シック (Modern Chic)", value: "dark walnut wood floor, dark gray stone tile accents, premium leather furniture, matte black metal details, warm indirect lighting, sophisticated urban atmosphere", desc: "ウォルナット、石目調、黒アイアンを合わせた洗練された都会的ホテルライク。" },
                 { name: "白系ミニマル (White Minimalist)", value: "seamless microcement floor, bright warm white plaster walls, minimalist white furniture, light gray fabrics, brushed nickel metallic accents, clean and bright aesthetics", desc: "シームレスモルタルの床、真っ白な漆喰、薄グレーを合わせた究極のミニマリスト。" },
                 { name: "ブルックリン・インダストリアル (Brooklyn Industrial)", value: "rough concrete ceiling, reclaimed weathered wood floor, red brick accent wall, exposed iron pipes and black steel framing, vintage leather sofa, amber glass details", desc: "コンクリート、古材、赤レンガ、黒アイアンを組み合わせた無骨なブルックリン風。" },
@@ -2845,7 +2845,8 @@
         let customPresets = {
             interior: [],
             exterior: [],
-            transition: []
+            transition: [],
+            panorama: []
         };
 
         let activeTab = 'interior';
@@ -2893,6 +2894,7 @@
                     if (parsed.interior) customPresets.interior = parsed.interior;
                     if (parsed.exterior) customPresets.exterior = parsed.exterior;
                     if (parsed.transition) customPresets.transition = parsed.transition;
+                    if (parsed.panorama) customPresets.panorama = parsed.panorama;
                 }
             } catch (e) {
                 console.error("LocalStorage load error:", e);
@@ -3306,6 +3308,14 @@
                     demolitionToggle: document.getElementById('demolitionToggle').checked,
                     transitionTargetAI: document.getElementById('transitionTargetAI').value
                 };
+            } else if (activeTab === 'panorama') {
+                data = {
+                    panoramaRoomType: document.getElementById('panoramaRoomType').value,
+                    panoramaLight: document.getElementById('panoramaLight').value,
+                    panoramaLightingPlan: document.getElementById('panoramaLightingPlan').value,
+                    panoramaStyle: document.getElementById('panoramaStyle').value,
+                    panoramaGreeneryLevel: document.getElementById('panoramaGreeneryLevel').value
+                };
             }
 
             customPresets[activeTab].push({
@@ -3424,6 +3434,18 @@
                     setSelectValue('transitionTargetAI', data.transitionTargetAI);
                 } else {
                     setSelectValue('transitionTargetAI', 'google-flow-video');
+                }
+            } else if (activeTab === 'panorama') {
+                setSelectValue('panoramaRoomType', data.panoramaRoomType);
+                setSelectValue('panoramaLight', data.panoramaLight);
+                if (data.hasOwnProperty('panoramaLightingPlan')) {
+                    setSelectValue('panoramaLightingPlan', data.panoramaLightingPlan);
+                }
+                setSelectValue('panoramaStyle', data.panoramaStyle);
+                if (data.hasOwnProperty('panoramaGreeneryLevel')) {
+                    setSelectValue('panoramaGreeneryLevel', data.panoramaGreeneryLevel);
+                } else {
+                    setSelectValue('panoramaGreeneryLevel', 'standard');
                 }
             }
             
@@ -3692,13 +3714,34 @@
                     lightingPlanText = `, <span class="variable">${lightingPlanVal}</span>`;
                 }
 
-                finalPrompt = `${interiorShapePrefix}${decorPrefix}Warm, cozy, photorealistic interior photograph of this modern <span class="variable">${roomVal}</span>, ${lightPrompt}${windowText}${lightingPlanText}, soft ambient shadows, highly detailed textures of <span class="variable">${styleVal}</span>, professional architectural digest portfolio photography, cozy lived-in atmosphere${cameraText}${aiOptWord}${doubleLockTag}${aspectSuffix}`;
+                const greeneryVal = document.getElementById('interiorGreeneryLevel').value;
+                const greeneryName = document.getElementById('interiorGreeneryLevel').options[document.getElementById('interiorGreeneryLevel').selectedIndex]?.text || "";
+
+                // 観葉植物の指定
+                let greeneryPrompt = "";
+                let greeneryJa = "";
+                if (greeneryVal === 'none') {
+                    greeneryPrompt = ", zero indoor plants, clean minimalist layout";
+                    greeneryJa = "［植物：なし］";
+                } else if (greeneryVal === 'minimal') {
+                    greeneryPrompt = ", a single sophisticated small green potted plant in the corner";
+                    greeneryJa = "［植物：ひかえめ］";
+                } else if (greeneryVal === 'standard') {
+                    greeneryPrompt = ", a few beautiful organic green indoor potted plants tastefully placed";
+                    greeneryJa = "［植物：標準］";
+                } else if (greeneryVal === 'lush') {
+                    greeneryPrompt = ", rich layers of lush green indoor plants, organic botanical feel, elegant indoor greenery";
+                    greeneryJa = "［植物：たっぷり］";
+                }
+
+                finalPrompt = `${interiorShapePrefix}${decorPrefix}Warm, cozy, photorealistic interior photograph of this modern <span class="variable">${roomVal}</span>, ${lightPrompt}${windowText}${lightingPlanText}, soft ambient shadows, highly detailed textures of <span class="variable">${styleVal}</span>, professional architectural digest portfolio photography, cozy lived-in atmosphere${greeneryPrompt}${cameraText}${aiOptWord}${doubleLockTag}${aspectSuffix}`;
             
                 const shapeJa = isInteriorShapeLocked ? "【元の間取り・窓の位置を厳密にロックし、】" : "";
                 const lightingPlanJa = lightingPlanName ? `（照明計画：${lightingPlanName}）` : "";
                 const cameraJa = cameraVal ? `（映像演出：${cameraName} ＆ 18mm広角・被写界深度効果）` : "（18mm広角レンズによる静止画アングル）";
                 const decorJa = decor !== 'standard' ? `［演出度：${decorName}］` : "";
-                translationText = `${shapeJa} ${lightName}のもとで、美しい${styleName}仕様の${roomName}を描き出します。${windowName}${decorJa}${lightingPlanJa}${cameraJa}（出力形式: ${targetAIName} / アスペクト比 ${aspect} 用に最適化済）`;
+                const windowJa = isWindowEnabled ? windowName : "";
+                translationText = `${shapeJa} ${lightName}のもとで、美しい${styleName}仕様の${roomName}を描き出します。${greeneryJa}${windowJa}${decorJa}${lightingPlanJa}${cameraJa}（出力形式: ${targetAIName} / アスペクト比 ${aspect} 用に最適化済）`;
 
             } else if (activeTab === 'exterior') {
                 const lightVal = document.getElementById('exteriorLight').value;
