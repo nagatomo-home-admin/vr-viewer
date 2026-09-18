@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
-// /hearing ページ専用のメタデータ定義
 export const metadata: Metadata = {
   title: "お住まい探し計画書",
-  description: "お施主様の資金計画先行型リノベーションにおけるご要望の整理と資金計画シミュレーションを行います。",
+  description: "対話型お住まい探し計画書・顧客要望ヒアリング",
+  manifest: "/manifest.json?v=6",
 };
 
 export default function HearingLayout({

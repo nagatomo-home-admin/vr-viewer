@@ -30,16 +30,16 @@ export default function SmartBoardMenu() {
 
   const tools = [
     {
-      name: 'マイホーム資金計画',
-      path: '/finance',
-      icon: '📊',
-      desc: '資金シミュレーター・A3計画書印刷',
-    },
-    {
       name: 'お住まい探し計画書',
       path: '/hearing',
       icon: '📝',
       desc: '対話型の顧客要望ヒアリング・整理',
+    },
+    {
+      name: 'マイホーム資金計画',
+      path: '/finance',
+      icon: '📊',
+      desc: '資金シミュレーター・A3計画書印刷',
     },
     {
       name: 'AI提案プレゼンボード',

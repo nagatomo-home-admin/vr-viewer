@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
 import fs from "fs";
 import path from "path";
+import { getPresentationData, savePresentationData } from "@/lib/db";
 
 // 図面比較ツールから送信されたBefore/After図面（Base64）とアノテーションデータを、
-// お施主様別プレゼンボードJSON（src/data/presentation/）へ同期・保存するAPI
+// お施主様別プレゼンボードJSONへ同期・保存するAPI
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -26,43 +27,47 @@ export async function POST(request: Request) {
       );
     }
 
-    // 1. 画像の保存処理 (Base64画像をPNGファイルとしてサーバー内に保存)
-    const uploadDir = path.join(process.cwd(), "public", "upload");
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
+    // Vercel(クラウド)環境かどうかの判定 (Bypass for Read-Only FS)
+    const isCloud = !!(process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN);
 
     let beforeFloorplanPath = "";
     let afterFloorplanPath = "";
 
-    if (beforeImage && beforeImage.startsWith("data:image")) {
-      const base64Data = beforeImage.replace(/^data:image\/\w+;base64,/, "");
-      const buffer = Buffer.from(base64Data, "base64");
-      const filename = `${safeCustomerId}_before.png`;
-      fs.writeFileSync(path.join(uploadDir, filename), buffer);
-      beforeFloorplanPath = `/upload/${filename}`;
-    }
+    if (isCloud) {
+      // クラウド環境（Vercel）では、画像のローカル書き出しを行わずBase64データをインラインで使用
+      if (beforeImage) beforeFloorplanPath = beforeImage;
+      if (afterImage) afterFloorplanPath = afterImage;
+      console.log("Vercel環境：画像をBase64形式のままJSONにインライン保存します。");
+    } else {
+      // 1. ローカル環境での画像保存処理 (Base64画像をPNGファイルとしてサーバー内に保存)
+      const uploadDir = path.join(process.cwd(), "public", "upload");
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
 
-    if (afterImage && afterImage.startsWith("data:image")) {
-      const base64Data = afterImage.replace(/^data:image\/\w+;base64,/, "");
-      const buffer = Buffer.from(base64Data, "base64");
-      const filename = `${safeCustomerId}_after.png`;
-      fs.writeFileSync(path.join(uploadDir, filename), buffer);
-      afterFloorplanPath = `/upload/${filename}`;
+      if (beforeImage && beforeImage.startsWith("data:image")) {
+        const base64Data = beforeImage.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        const filename = `${safeCustomerId}_before.png`;
+        fs.writeFileSync(path.join(uploadDir, filename), buffer);
+        beforeFloorplanPath = `/upload/${filename}`;
+      }
+
+      if (afterImage && afterImage.startsWith("data:image")) {
+        const base64Data = afterImage.replace(/^data:image\/\w+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        const filename = `${safeCustomerId}_after.png`;
+        fs.writeFileSync(path.join(uploadDir, filename), buffer);
+        afterFloorplanPath = `/upload/${filename}`;
+      }
     }
 
     // 2. 顧客プレゼンデータのロードまたはテンプレート作成
-    const dataDir = path.join(process.cwd(), "src", "data", "presentation");
-    const filePath = path.join(dataDir, `${safeCustomerId}.json`);
-    const defaultPath = path.join(dataDir, "default.json");
+    let clientData = await getPresentationData(safeCustomerId);
 
-    let clientData: any;
-    if (fs.existsSync(filePath)) {
-      // 既存データがある場合は読み込む
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      clientData = JSON.parse(fileContent);
-    } else {
-      // 既存データが無い場合はテンプレート (default.json) を読み込む
+    if (!clientData) {
+      // 既存データが無い場合はテンプレート (default.json) を読み込む (default.jsonはデプロイに含まれるためfsで読み込み可能)
+      const defaultPath = path.join(process.cwd(), "src", "data", "presentation", "default.json");
       if (fs.existsSync(defaultPath)) {
         const fileContent = fs.readFileSync(defaultPath, "utf8");
         clientData = JSON.parse(fileContent);
@@ -124,13 +129,16 @@ export async function POST(request: Request) {
       annotations: annotations || []
     };
 
-    // 5. JSONファイルとして上書き保存
-    fs.writeFileSync(filePath, JSON.stringify(clientData, null, 2), "utf8");
+    // 5. データベース抽象化層を通じて保存を実行
+    const success = await savePresentationData(safeCustomerId, clientData.clientName, clientData);
+    if (!success) {
+      throw new Error("Failed to write imported data to storage.");
+    }
 
     return NextResponse.json({
       success: true,
       customerId: safeCustomerId,
-      message: `${safeCustomerId}.json へ図面と比較ストーリーの流用同期が完了しました。`
+      message: `${safeCustomerId} へ図面と比較ストーリーの流用同期が完了しました。`
     });
   } catch (error) {
     console.error("Failed to import comparer data:", error);

@@ -18,6 +18,7 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "図面比較・変更点AI抽出",
   description: "AI（Gemini）を活用してリノベーション図面の変更点を自動抽出し、注釈を管理・書き出しするシステムです。",
+  manifest: "/manifest.json?v=6",
 };
 
 // ルートレイアウトコンポーネント
@@ -34,6 +35,25 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <SmartBoardMenu />
         {children}
+        {/* PWAサービスワーカーの自動登録 */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                  navigator.serviceWorker.register('/sw.js').then(
+                    function(reg) {
+                      console.log('PWA ServiceWorker registered successfully with scope: ', reg.scope);
+                    },
+                    function(err) {
+                      console.log('PWA ServiceWorker registration failed: ', err);
+                    }
+                  );
+                });
+              }
+            `
+          }}
+        />
       </body>
     </html>
   );

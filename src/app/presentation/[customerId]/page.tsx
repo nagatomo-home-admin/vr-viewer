@@ -3,6 +3,7 @@ import path from "path";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import PresentationClientPage from "./PresentationClientPage";
+import { getPresentationData } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -18,16 +19,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   
   let clientName = customerId;
   try {
-    const filePath = path.join(
-      process.cwd(),
-      "src",
-      "data",
-      "presentation",
-      `${customerId}.json`
-    );
-    if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      const clientData = JSON.parse(fileContent);
+    const clientData = await getPresentationData(customerId);
+    if (clientData) {
       clientName = clientData.clientName || customerId;
     }
   } catch (e) {
@@ -43,25 +36,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-// 顧客IDに対応するJSONデータを動的に読み込むサーバーコンポーネント
+// 顧客IDに対応するデータを動的に読み込むサーバーコンポーネント
 export default async function Page({ params }: PageProps) {
   const { customerId } = await params;
 
   let clientData;
   try {
-    const filePath = path.join(
-      process.cwd(),
-      "src",
-      "data",
-      "presentation",
-      `${customerId}.json`
-    );
-
-    if (fs.existsSync(filePath)) {
-      const fileContent = fs.readFileSync(filePath, "utf8");
-      clientData = JSON.parse(fileContent);
-    } else {
-      // 指定したIDのファイルが存在しない場合は、default.jsonをフォールバックとして読み込む
+    clientData = await getPresentationData(customerId);
+    
+    if (!clientData) {
+      // 指定したIDのデータが存在しない場合は、default.jsonをフォールバックとして読み込む
       const defaultPath = path.join(
         process.cwd(),
         "src",

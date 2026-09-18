@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
+import { deleteHearingData } from "@/lib/db";
 
-// 指定された顧客IDのJSONファイルをサーバー側から完全に物理削除するAPI
+// 指定された顧客IDのヒアリングデータを完全に削除するAPI
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -18,21 +17,15 @@ export async function POST(request: Request) {
 
     // 顧客IDの安全な形式チェック
     const safeCustomerId = customerId.replace(/[^a-zA-Z0-9-_]/g, "");
-    const filePath = path.join(
-      process.cwd(),
-      "src",
-      "data",
-      "hearing",
-      `${safeCustomerId}.json`
-    );
 
-    // ファイルが存在すれば削除
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // Vercel KV（またはローカルJSON）から削除
+    const success = await deleteHearingData(safeCustomerId);
+
+    if (success) {
       return NextResponse.json({ success: true });
     } else {
       return NextResponse.json(
-        { error: "Customer data file not found" },
+        { error: "Customer data not found or failed to delete" },
         { status: 404 }
       );
     }
@@ -44,3 +37,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

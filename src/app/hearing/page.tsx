@@ -435,9 +435,9 @@ export default function HearingPage() {
     }
   };
 
-  // 資金計画API（ポート3005）への自動転送保存
+  // 資金計画への自動転送保存
   const handleShareData = async () => {
-    setShareStatus({ type: "info", message: "資金計画API（ポート3005）へデータ共有を転送中..." });
+    setShareStatus({ type: "info", message: "資金計画にデータを共有中..." });
     
     try {
       const response = await fetch("/api/presentation/share", {
@@ -449,7 +449,12 @@ export default function HearingPage() {
           customerName: data.customerName,
           currentRent: data.currentRent,
           propertyPrice: data.propertyPrice,
-          renovePrice: data.renovePrice
+          renovePrice: data.renovePrice,
+          customerId: data.customerId,
+          selfFund: data.selfFund,
+          loanRate: data.loanRate,
+          loanTerm: data.loanTerm,
+          otherExpense: data.otherExpense
         })
       });
 
@@ -461,16 +466,17 @@ export default function HearingPage() {
           message: `データ共有＆資金計画の再生成に成功しました！\n（連携物件: ${result.propertyName}）` 
         });
       } else {
-                throw new Error(result.error || "データ転送に失敗しました。");
+        throw new Error(result.error || "データ共有に失敗しました。");
       }
     } catch (error: any) {
       console.error(error);
       setShareStatus({ 
         type: "error", 
-        message: `資金計画API(3005)連携に失敗しました。\n※VBS起動でポート3005が立ち上がっているかご確認ください。\n(エラー: ${error.message})` 
+        message: `資金計画連携に失敗しました。\n(エラー: ${error.message})` 
       });
     }
   };
+
 
   // 各個別入力フォームの変更ハンドラ
   const handleInputChange = (field: keyof CustomerData, value: any) => {
@@ -905,7 +911,7 @@ export default function HearingPage() {
             value={data.customerId || ""}
             className="bg-[#132A4A] text-white border border-white/20 rounded-xl px-3 py-2 text-xs font-bold focus:outline-none focus:border-[#D9A05B] cursor-pointer mr-1 whitespace-nowrap"
           >
-            <option value="">📂 保存データを選択...</option>
+            <option value="">📂 保存データの読込み...</option>
             {savedCustomers.map((c) => (
               <option key={c.id} value={c.id} className="text-slate-900 bg-white">{c.name} ({c.id})</option>
             ))}
@@ -915,22 +921,21 @@ export default function HearingPage() {
             onClick={handleSaveServer}
             className="bg-[#D9A05B] hover:bg-[#D9A05B]/90 text-[#0A192F] font-bold text-xs px-3 py-2 rounded-xl transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
           >
-            💾 上書き保存
+            💾 サーバーに上書き保存
           </button>
 
           <button 
-            onClick={handleDeleteServer}
-            disabled={!data.customerId}
-            className="bg-rose-600 hover:bg-rose-500 disabled:opacity-30 text-white font-bold text-xs px-3 py-2 rounded-xl transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
+            onClick={handleShareData}
+            className="bg-[#132A4A] hover:bg-[#1e3d6b] text-white font-bold text-xs px-3 py-2 rounded-xl border border-white/10 transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
           >
-            🗑️ データ削除
+            🔗 資金計画にデータを共有
           </button>
 
           <button 
-            onClick={handleClearAll}
-            className="bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-xs px-3 py-2 rounded-xl border border-red-500/20 transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
+            onClick={handlePrint}
+            className="bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs px-3 py-2 rounded-xl transition shadow flex items-center gap-1.5 mr-1 whitespace-nowrap"
           >
-            🧹 全クリア
+            🖨️ PDFを保存
           </button>
 
           <button 
@@ -992,9 +997,12 @@ export default function HearingPage() {
                     <label className="block text-slate-400 mb-1 font-bold text-[10px]">顧客ID（半角英数・保存用）</label>
                     <input 
                       type="text" 
+                      id="c-key-fld"
+                      name="c-key-fld"
                       placeholder="例: tateno"
                       value={data.customerId || ""}
                       onChange={(e) => handleInputChange("customerId", e.target.value.replace(/[^a-zA-Z0-9-_]/g, ""))}
+                      autoComplete="one-time-code"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#D9A05B] focus:ring-1 focus:ring-[#D9A05B]/30 transition"
                     />
                   </div>
@@ -1002,9 +1010,12 @@ export default function HearingPage() {
                     <label className="block text-slate-400 mb-1 font-bold text-[10px]">お客様お名前（苗字のみ）</label>
                     <input 
                       type="text" 
+                      id="c-val-fld"
+                      name="c-val-fld"
                       value={data.customerName}
                       onChange={(e) => handleInputChange("customerName", e.target.value)}
                       placeholder="例: 立野"
+                      autoComplete="one-time-code"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#D9A05B] focus:ring-1 focus:ring-[#D9A05B]/30 transition"
                     />
                   </div>
@@ -1012,9 +1023,12 @@ export default function HearingPage() {
                     <label className="block text-slate-400 mb-1 font-bold text-[10px]">担当者名</label>
                     <input 
                       type="text" 
+                      id="a-val-fld"
+                      name="a-val-fld"
                       value={data.advisorName}
                       onChange={(e) => handleInputChange("advisorName", e.target.value)}
                       placeholder="例: 長友"
+                      autoComplete="one-time-code"
                       className="w-full bg-white border border-slate-300 rounded-xl p-2.5 text-slate-900 text-sm placeholder-slate-400 focus:outline-none focus:border-[#D9A05B] focus:ring-1 focus:ring-[#D9A05B]/30 transition"
                     />
                   </div>
@@ -1419,48 +1433,36 @@ export default function HearingPage() {
               )}
             </div>
 
-            {/* 出力とデータ連携 */}
+            {/* データの初期化・削除 */}
             <div className="space-y-3 pt-2">
               <h3 
                 onClick={() => toggleMenu("output")}
                 className="font-bold text-white border-l-4 border-[#D9A05B] pl-2 pb-0.5 text-xs bg-[#132A4A]/40 hover:bg-[#132A4A]/70 py-1 pr-2 rounded-r flex items-center justify-between cursor-pointer transition select-none"
               >
                 <span className="flex items-center gap-1.5">
-                  <span>📤</span> 出力とデータ連携
+                  <span>⚙️</span> データの初期化・削除
                 </span>
                 <span className="text-[10px] text-slate-400 font-bold">{menuOpen.output ? "▼" : "▶"}</span>
               </h3>
               {menuOpen.output && (
                 <div className="flex flex-col gap-2 px-1">
                   <button 
-                    onClick={handleShareData}
-                    className="w-full bg-[#132A4A] hover:bg-[#1e3d6b] text-white font-bold text-xs py-2.5 px-3 rounded-xl border border-white/10 transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
+                    onClick={handleClearAll}
+                    className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 font-bold text-xs py-2.5 px-3 rounded-xl border border-red-500/20 transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
                   >
-                    🔗 資金計画データ共有 (ポート3005)
+                    🧹 全クリア
                   </button>
                   <button 
-                    onClick={handlePrint}
-                    className="w-full bg-slate-700 hover:bg-slate-600 text-white font-bold text-xs py-2.5 px-3 rounded-xl transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
+                    onClick={handleDeleteServer}
+                    disabled={!data.customerId}
+                    className="w-full bg-rose-600 hover:bg-rose-500 disabled:opacity-30 text-white font-bold text-xs py-2.5 px-3 rounded-xl transition shadow flex items-center justify-center gap-1.5 whitespace-nowrap"
                   >
-                    🖨️ PDFを保存 (印刷画面を開く)
+                    🗑️ データ削除
                   </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button 
-                      onClick={handleExportHtml}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 px-2 rounded-xl border border-slate-800 transition shadow flex items-center justify-center gap-1 whitespace-nowrap"
-                    >
-                      🌐 HTML書出
-                    </button>
-                    <button 
-                      onClick={handleSaveJson}
-                      className="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs py-2.5 px-2 rounded-xl border border-slate-800 transition shadow flex items-center justify-center gap-1 whitespace-nowrap"
-                    >
-                      💾 JSON保存
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
+
 
           </div>
         </div>
@@ -1468,16 +1470,6 @@ export default function HearingPage() {
         {/* 右側：スライドプレビューエリア */}
         <div className="flex-grow min-w-0 p-8 overflow-y-auto flex flex-col items-center bg-slate-200 relative">
           
-          {/* フルスクリーン解除用フローティングボタン（フルスクリーン時のみ表示） */}
-          {isFullscreen && (
-            <button
-              onClick={() => document.exitFullscreen()}
-              className="fixed top-4 right-4 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xl z-50 transition no-print flex items-center gap-1.5"
-            >
-              ✕ フルスクリーン解除
-            </button>
-          )}
-
           {/* サイドバー折りたたみトグルボタン */}
           <div className={`w-full max-w-[1100px] mb-4 flex justify-between items-center no-print`}>
             <div>
@@ -1517,13 +1509,32 @@ export default function HearingPage() {
           {/* スライド実体リスト（印刷時はこの部分がA3横単位で改ページされる） */}
           <div 
             id="slides-container" 
-            className={`w-full transition-all duration-300 ${
+            className={`w-full transition-all duration-300 relative ${
               isFullscreen 
                 ? "bg-[#0d1b2e] overflow-y-auto h-screen p-12 flex flex-col items-center [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#0d1b2e] [&::-webkit-scrollbar-thumb]:bg-slate-700 [&::-webkit-scrollbar-thumb]:rounded-full" 
                 : ""
             }`}
           >
+            {/* フルスクリーン解除用フローティングボタン（フルスクリーン時のみ表示。フルスクリーン対象要素の内側に配置することで表示を維持） */}
+            {isFullscreen && (
+              <button
+                onClick={() => {
+                  if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                  } else if ((document as any).webkitExitFullscreen) {
+                    (document as any).webkitExitFullscreen();
+                  } else if ((document as any).msExitFullscreen) {
+                    (document as any).msExitFullscreen();
+                  }
+                }}
+                className="fixed top-4 right-4 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2 rounded-xl shadow-2xl z-50 transition no-print flex items-center gap-1.5 cursor-pointer"
+              >
+                ✕ フルスクリーン解除
+              </button>
+            )}
+
             <div className="space-y-8 print:space-y-0 print:p-0 w-full max-w-[1100px]">
+
             {/* スライド1: 概要 & 今後のロードマップ */}
             <div 
               style={{ aspectRatio: "1.414 / 1", paddingLeft: "96px", paddingRight: "48px", paddingTop: "56px", paddingBottom: "56px" }}
@@ -1617,7 +1628,6 @@ export default function HearingPage() {
                   <span className="bg-[#0A192F] text-white rounded px-3 py-1 text-sm font-black">01</span>
                   <h2 className="text-lg font-black text-[#0A192F] tracking-wide">ご要望の整理とご希望条件</h2>
                 </div>
-                <span className="text-xs text-gray-400 font-extrabold uppercase tracking-widest">Nagatomo Home</span>
               </div>
 
               {/* メインエリア */}
@@ -1761,7 +1771,6 @@ export default function HearingPage() {
                   <span className="bg-[#0A192F] text-white rounded px-3 py-1 text-sm font-black">02</span>
                   <h2 className="text-lg font-black text-[#0A192F] tracking-wide">賃貸比較 ＆ 資金計画シミュレーション</h2>
                 </div>
-                <span className="text-xs text-gray-400 font-extrabold uppercase tracking-widest">Nagatomo Home</span>
               </div>
 
               {/* メインエリア */}
@@ -1812,11 +1821,11 @@ export default function HearingPage() {
                       <div className="space-y-1.5 text-xs font-bold text-gray-700 flex-grow flex flex-col justify-around">
                         <div className="flex justify-between">
                           <span className="text-gray-600">① 中古物件購入費用:</span>
-                          <span className="font-black text-[#0A192F]">${data.propertyPrice.toLocaleString()} 万円</span>
+                          <span className="font-black text-[#0A192F]">{data.propertyPrice.toLocaleString()} 万円</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">② 高性能フルリノベ費用:</span>
-                          <span className="font-black text-[#0A192F]">${data.renovePrice.toLocaleString()} 万円</span>
+                          <span className="font-black text-[#0A192F]">{data.renovePrice.toLocaleString()} 万円</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">③ 購入諸費用（概算）:</span>
